@@ -119,10 +119,9 @@ class CNNLayerNorm(nn.Module):
         self.layer_norm = nn.LayerNorm(n_feats)
 
     def forward(self, x):
-        # x (batch, channel, feature, time)
-        x = x.transpose(2, 3).contiguous() # (batch, channel, time, feature)
+        x = x.transpose(2, 3).contiguous()
         x = self.layer_norm(x)
-        return x.transpose(2, 3).contiguous() # (batch, channel, feature, time) 
+        return x.transpose(2, 3).contiguous() 
 
 class ResidualCNN(nn.Module):
     def __init__(self, in_channels, out_channels, kernel, stride, dropout, n_feats):
@@ -141,7 +140,7 @@ class ResidualCNN(nn.Module):
         self.layer_norm2 = CNNLayerNorm(n_feats)
 
     def forward(self, x):
-        residual = x  # (batch, channel, feature, time)
+        residual = x 
         
         x = self.layer_norm1(x)
         x = F.gelu(x)
@@ -157,7 +156,7 @@ class ResidualCNN(nn.Module):
         
         x += residual
         
-        return x # (batch, channel, feature, time)
+        return x 
 
 class BidirectionalGRU(nn.Module):
     def __init__(self, rnn_dim, hidden_size, dropout, batch_first):

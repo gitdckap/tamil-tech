@@ -44,15 +44,14 @@ class CustomCNNbiRNN(nn.Module):
         
         return x
 
-class OldSpeechRecognitionModel(nn.Module):
+class TamilASRModel(nn.Module):
     def __init__(self, n_cnn_layers, n_rnn_layers, rnn_dim, n_class, n_feats, stride=2, dropout=0.1, training=True):
-        super(OldSpeechRecognitionModel, self).__init__()
+        super(TamilASRModel, self).__init__()
         
         n_feats = n_feats//2
 
-        self.cnn = nn.Conv2d(1, 32, 3, stride=stride, padding=3//2)  # cnn for extracting hierachical features
+        self.cnn = nn.Conv2d(1, 32, 3, stride=stride, padding=3//2)
 
-        # n residual cnn layers with filter size of 32
         self.rescnn_layers = nn.Sequential(*[
             ResidualCNN(32, 32, kernel=3, stride=1, dropout=dropout, n_feats=n_feats) 
             for _ in range(n_cnn_layers)

@@ -335,7 +335,7 @@ def load_model(model_path='asr_model.pt'):
   use_cuda = torch.cuda.is_available()
   device = torch.device("cuda" if use_cuda else "cpu")
 
-  model = OldSpeechRecognitionModel(
+  model = TamilASRModel(
     hparams['n_cnn_layers'], hparams['n_rnn_layers'], hparams['rnn_dim'],
     hparams['n_class'], hparams['n_feats'], hparams['stride'], hparams['dropout']
   ).to(device)
