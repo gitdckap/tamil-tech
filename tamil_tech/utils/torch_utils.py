@@ -37,7 +37,6 @@ def correct_spelling(predictions):
           correct_unigrams.append(word)
       else:
         # The word did not occur in the training data!
-          #print("Spelling error detected:\t{0}".format(word))
           # Now find a good replacement
           minimum_distance = math.inf
           best_replacement = None
@@ -49,7 +48,6 @@ def correct_spelling(predictions):
                   minimum_distance = distance
                   best_replacement = vocab_word
           # Show the correction
-          # print("Best found correct word:\t{0} (distance: {1})\n".format(best_replacement, minimum_distance))
           correct_unigrams.append(best_replacement)
   
   return ''.join(utf8.get_letters(' '.join(correct_unigrams)))
