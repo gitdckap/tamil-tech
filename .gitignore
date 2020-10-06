@@ -1,0 +1,14 @@
+asr_model.pt
+.ipynb_checkpoints
+tamil_tech/__pycache__
+tamil_tech/encoders/__pycache__
+tamil_tech/layers/__pycache__
+tamil_tech/layers/tf/__pycache__
+tamil_tech/layers/torch/__pycache__
+tamil_tech/models/__pycache__
+tamil_tech/models/tf/__pycache__
+tamil_tech/models/torch/__pycache__
+tamil_tech/utils/__pycache__
+tamil_tech/utils/featurizers/__pycache__
+tamil_tech/zero_shot/__pycache__
+test
