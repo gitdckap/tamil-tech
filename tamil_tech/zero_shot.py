@@ -37,7 +37,7 @@ class TamilASR(object):
 
     audio = nn.utils.rnn.pad_sequence(audio, batch_first=True).unsqueeze(1).transpose(2, 3)
 
-    output = self.model(audio.to(self.device))  # (batch, time, n_class)
+    output = self.model(audio.to(self.device))  
     output = F.log_softmax(output, dim=2)
     output = output.transpose(0, 1)
 
@@ -85,7 +85,7 @@ class TamilASR(object):
         audio = [audio]
         audio = nn.utils.rnn.pad_sequence(audio, batch_first=True).unsqueeze(1).transpose(2, 3)
 
-        output = self.model(audio.to(self.device))  # (batch, time, n_class)
+        output = self.model(audio.to(self.device)) 
         output = F.log_softmax(output, dim=2)
         output = output.transpose(0, 1)
 
@@ -126,11 +126,11 @@ class TamilASR(object):
 
         # print("Opening Window...")
 
-        for i in range(0, int(48000 / 1024 * 7)):
+        for i in range(0, int(48000 / 1024 * 6)):
           data = self.stream.read(1024)
           frames.append(data)
                   
-        wf = wave.open(f'tamil_tech/zero_shot/__pycache__/{self.cnt}.wav', 'wb')
+        wf = wave.open(f'tamil_tech/__pycache__/{self.cnt}.wav', 'wb')
         wf.setnchannels(2)
         wf.setsampwidth(self.p.get_sample_size(pyaudio.paInt16))
         wf.setframerate(48000)
@@ -139,7 +139,7 @@ class TamilASR(object):
 
         # print("Closing Window...")
 
-        print(self.infer_file(f'tamil_tech/zero_shot/__pycache__/{self.cnt}.wav', verbose=False), end=' ')
+        print(self.infer_file(f'tamil_tech/__pycache__/{self.cnt}.wav', verbose=False), end=' ')
 
       except Exception as e:
         print(e)
