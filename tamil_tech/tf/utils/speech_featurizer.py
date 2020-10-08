@@ -7,8 +7,8 @@ import librosa
 import soundfile as sf
 import tensorflow as tf
 
-from tamil_tech.utils.tf_utils import log10
-from tamil_tech.utils.featurizers.gammatone import fft_weights
+from tamil_tech.tf.utils import log10
+from tamil_tech.tf.utils.gammatone import fft_weights
 
 def read_raw_audio(audio, sample_rate=16000):
     if isinstance(audio, str):

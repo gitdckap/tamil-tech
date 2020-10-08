@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 
-from tamil_tech.utils.tf_utils import shape_list
+from tamil_tech.tf.utils import shape_list
 
 pi = tf.constant(np.pi, dtype=tf.complex64)
 

@@ -17,7 +17,7 @@ from tamil import utf8
 import torch.nn.functional as F
 import torch.utils.data as data
 import matplotlib.pyplot as plt
-from tamil_tech.models.torch import *
+from tamil_tech.torch.models import *
 from torch.utils.data import DataLoader, Dataset
 
 def get_words(sentence):
@@ -345,7 +345,7 @@ def load_model(model_path='asr_model.pt'):
     print("Downloading Model...")
     file_id = '1-qqd0bp-Vh_xJlDq9OccaJbDP8rEotRo'
     download_file_from_google_drive(file_id, model_path)
-    print("Downloaded Model succesfully...")
+    print("Downloaded Model Successfully...")
 
   model.load_state_dict(torch.load(model_path, map_location=device))
 

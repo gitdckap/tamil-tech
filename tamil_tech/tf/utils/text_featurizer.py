@@ -8,7 +8,7 @@ import tensorflow as tf
 import tensorflow_datasets as tds
 from tamil import utf8
 
-from tamil_tech.utils.tf_utils import preprocess_paths
+from tamil_tech.tf.utils import preprocess_paths
 from . import TAMIL
 
 class TextFeaturizer(metaclass=abc.ABCMeta):

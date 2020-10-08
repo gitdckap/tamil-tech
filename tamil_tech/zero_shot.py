@@ -2,10 +2,10 @@ import os
 import torch
 import shutil
 import torchvision
-from tamil_tech.utils.torch_utils import *
-from tamil_tech.models.torch import *
 import torch.nn as nn
 import torch.nn.functional as F
+from tamil_tech.torch.utils import *
+from tamil_tech.torch.models import *
 
 class TamilASR(object):
   def __init__(self, use_gpu=True):
@@ -124,8 +124,6 @@ class TamilASR(object):
         audios = []
         frames = []
 
-        # print("Opening Window...")
-
         for i in range(0, int(48000 / 1024 * 6)):
           data = self.stream.read(1024)
           frames.append(data)
@@ -136,8 +134,6 @@ class TamilASR(object):
         wf.setframerate(48000)
         wf.writeframes(b''.join(frames))
         wf.close()
-
-        # print("Closing Window...")
 
         print(self.infer_file(f'tamil_tech/__pycache__/{self.cnt}.wav', verbose=False), end=' ')
 
