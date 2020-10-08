@@ -16,7 +16,7 @@ class TextFeaturizer(metaclass=abc.ABCMeta):
         self.scorer = None
         self.decoder_config = decoder_config
         if not self.decoder_config.get("vocabulary", None):
-            self.decoder_config["vocabulary"] = TAMIL  # Default language is english
+            self.decoder_config["vocabulary"] = TAMIL  
         self.decoder_config["vocabulary"] = preprocess_paths(self.decoder_config["vocabulary"])
         self.blank = None
         self.tokens2indices = {}
@@ -60,7 +60,6 @@ class TextFeaturizer(metaclass=abc.ABCMeta):
     @abc.abstractclassmethod
     def indices2upoints(self, indices):
         raise NotImplementedError()
-
 
 class CharFeaturizer(TextFeaturizer):
     """
@@ -160,7 +159,6 @@ class CharFeaturizer(TextFeaturizer):
             indices = self.normalize_indices(indices)
             upoints = tf.gather_nd(self.upoints, tf.expand_dims(indices, axis=-1))
             return upoints
-
 
 class SubwordFeaturizer(TextFeaturizer):
     """

@@ -1,8 +1,269 @@
 import typing
 import tensorflow as tf
 from tamil_tech.utils.tf_utils import *
+from tensorflow_addons.image import sparse_image_warp
 
 L2 = tf.keras.regularizers.l2(1e-6)
+
+class SpecAugment(tf.keras.layers.Layer):
+    def __init__(self, 
+                 frequency_masking_para=27, 
+                 frequency_mask_num=2, 
+                 time_masking_para=100, 
+                 time_mask_num=2, 
+                 time_warping_para=80,
+                 name='spectrogram_augmentation', 
+                 **kwargs):
+        super(SpecAugment, self).__init__(name=name, **kwargs)
+
+        self.frequency_masking_para = frequency_masking_para
+        self.frequency_mask_num = frequency_mask_num
+
+        self.time_masking_para = time_masking_para
+        self.time_mask_num = time_mask_num
+        self.time_warping_para = time_warping_para
+    
+    def sparse_warp(self, mel_spectrogram, time_warping_para=80):
+        """Spec augmentation Calculation Function.
+        'SpecAugment' have 3 steps for audio data augmentation.
+        first step is time warping using Tensorflow's image_sparse_warp function.
+        Second step is frequency masking, last step is time masking.
+        # Arguments:
+        mel_spectrogram(numpy array): audio file path of you want to warping and masking.
+        time_warping_para(float): Augmentation parameter, "time warp parameter W".
+            If none, default = 80 for LibriSpeech.
+        # Returns
+        mel_spectrogram(numpy array): warped and masked mel spectrogram.
+        """
+
+        fbank_size = tf.shape(mel_spectrogram)
+        n, v = fbank_size[1], fbank_size[2]
+
+        # Step 1 : Time warping
+        # Image warping control point setting.
+        # Source
+        pt = tf.random.uniform([], time_warping_para, n-time_warping_para, tf.int32) # radnom point along the time axis
+        src_ctr_pt_freq = tf.range(v // 2)  # control points on freq-axis
+        src_ctr_pt_time = tf.ones_like(src_ctr_pt_freq) * pt  # control points on time-axis
+        src_ctr_pts = tf.stack((src_ctr_pt_time, src_ctr_pt_freq), -1)
+        src_ctr_pts = tf.cast(src_ctr_pts, dtype=tf.float32)
+
+        # Destination
+        w = tf.random.uniform([], -time_warping_para, time_warping_para, tf.int32)  # distance
+        dest_ctr_pt_freq = src_ctr_pt_freq
+        dest_ctr_pt_time = src_ctr_pt_time + w
+        dest_ctr_pts = tf.stack((dest_ctr_pt_time, dest_ctr_pt_freq), -1)
+        dest_ctr_pts = tf.cast(dest_ctr_pts, dtype=tf.float32)
+
+        # warp
+        source_control_point_locations = tf.expand_dims(src_ctr_pts, 0)  # (1, v//2, 2)
+        dest_control_point_locations = tf.expand_dims(dest_ctr_pts, 0)  # (1, v//2, 2)
+
+        warped_image, _ = sparse_image_warp(mel_spectrogram,
+                                            source_control_point_locations,
+                                            dest_control_point_locations)
+        return warped_image
+
+    def frequency_masking(self, mel_spectrogram, v, frequency_masking_para=27, frequency_mask_num=2):
+        """Spec augmentation Calculation Function.
+        'SpecAugment' have 3 steps for audio data augmentation.
+        first step is time warping using Tensorflow's image_sparse_warp function.
+        Second step is frequency masking, last step is time masking.
+        # Arguments:
+        mel_spectrogram(numpy array): audio file path of you want to warping and masking.
+        frequency_masking_para(float): Augmentation parameter, "frequency mask parameter F"
+            If none, default = 100 for LibriSpeech.
+        frequency_mask_num(float): number of frequency masking lines, "m_F".
+            If none, default = 1 for LibriSpeech.
+        # Returns
+        mel_spectrogram(numpy array): warped and masked mel spectrogram.
+        """
+        # Step 2 : Frequency masking
+        fbank_size = tf.shape(mel_spectrogram)
+        n, v = fbank_size[1], fbank_size[2]
+
+        for i in range(frequency_mask_num):
+            f = tf.random.uniform([], minval=0, maxval=frequency_masking_para, dtype=tf.int32)
+            v = tf.cast(v, dtype=tf.int32)
+            f0 = tf.random.uniform([], minval=0, maxval=v-f, dtype=tf.int32)
+
+            # warped_mel_spectrogram[f0:f0 + f, :] = 0
+            mask = tf.concat((tf.ones(shape=(1, n, v - f0 - f, 1)),
+                            tf.zeros(shape=(1, n, f, 1)),
+                            tf.ones(shape=(1, n, f0, 1)),
+                            ), 2)
+            mel_spectrogram = mel_spectrogram * mask
+        
+        return tf.cast(mel_spectrogram, dtype=tf.float32)
+
+    def time_masking(self, mel_spectrogram, tau, time_masking_para=100, time_mask_num=2):
+        """Spec augmentation Calculation Function.
+        'SpecAugment' have 3 steps for audio data augmentation.
+        first step is time warping using Tensorflow's image_sparse_warp function.
+        Second step is frequency masking, last step is time masking.
+        # Arguments:
+        mel_spectrogram(numpy array): audio file path of you want to warping and masking.
+        time_masking_para(float): Augmentation parameter, "time mask parameter T"
+            If none, default = 27 for LibriSpeech.
+        time_mask_num(float): number of time masking lines, "m_T".
+            If none, default = 1 for LibriSpeech.
+        # Returns
+        mel_spectrogram(numpy array): warped and masked mel spectrogram.
+        """
+        fbank_size = tf.shape(mel_spectrogram)
+        n, v = fbank_size[1], fbank_size[2]
+
+        # Step 3 : Time masking
+        for i in range(time_mask_num):
+            t = tf.random.uniform([], minval=0, maxval=time_masking_para, dtype=tf.int32)
+            t0 = tf.random.uniform([], minval=0, maxval=tau-t, dtype=tf.int32)
+
+            # mel_spectrogram[:, t0:t0 + t] = 0
+            mask = tf.concat((tf.ones(shape=(1, n-t0-t, v, 1)),
+                            tf.zeros(shape=(1, t, v, 1)),
+                            tf.ones(shape=(1, t0, v, 1)),
+                            ), 1)
+            mel_spectrogram = mel_spectrogram * mask
+        
+        return tf.cast(mel_spectrogram, dtype=tf.float32)
+
+    def call(self, inputs, training=False):
+        v = inputs.shape[0]
+        tau = inputs.shape[1]
+
+        warped_mel_spectrogram = self.sparse_warp(inputs)
+        warped_frequency_spectrogram = self.frequency_masking(warped_mel_spectrogram, v=v)
+        warped_frequency_time_sepctrogram = self.time_masking(warped_frequency_spectrogram, tau=tau)
+
+        return warped_frequency_time_sepctrogram
+    
+    def get_config(self):
+        conf = super(SpecAugment, self).get_config()
+        
+        conf.update({'frequency_masking_para': self.frequency_masking_para,
+                     'frequency_mask_num': self.frequency_mask_num,
+                     'time_masking_para': self.time_masking_para,
+                     'time_mask_num': self.time_mask_num,
+                     'time_warping_para': self.time_warping_num
+                    })
+        
+        return conf
+
+class GELU(tf.keras.layers.Layer):
+    def __init__(self,
+                 name="gelu_activation",
+                 **kwargs):
+        super(GELU, self).__init__(name=name, **kwargs)
+
+    def call(self, inputs, **kwargs):
+        outputs = 0.5 * (1.0 + tf.math.erf(inputs / tf.sqrt(2.0)))
+        return inputs * outputs
+
+    def get_config(self):
+        conf = super(GELU, self).get_config()
+        return conf
+
+class Swish(tf.keras.layers.Layer):
+    def __init__(self,
+                 name="swish_activation",
+                 **kwargs):
+        super(Swish, self).__init__(name=name, **kwargs)
+
+    def call(self, inputs, **kwargs):
+        outputs = tf.nn.swish(inputs)
+        return outputs
+
+    def get_config(self):
+        conf = super(Swish, self).get_config()
+        return conf
+
+class ResidualBlock(tf.keras.layers.Layer):
+    def __init__(self, units, kernel, stride, dropout, name='residual_block', **kwargs):
+        super(ResidualBlock, self).__init__(name=name, **kwargs)
+        
+        self.units = units
+        
+        self.ln1 = tf.keras.layers.LayerNormalization()
+        self.gelu1 = GELU()
+        self.dropout1 = tf.keras.layers.Dropout(dropout)
+        self.conv1 = tf.keras.layers.Conv2D(units, kernel_size=(kernel, kernel), strides=(stride, stride), padding='same')
+        self.swish1 = Swish()
+        self.bn1 = tf.keras.layers.BatchNormalization()
+
+        self.ln2 = tf.keras.layers.LayerNormalization()
+        self.gelu2 = GELU()
+        self.dropout2 = tf.keras.layers.Dropout(dropout)
+        self.conv2 = tf.keras.layers.Conv2D(units, kernel_size=(kernel, kernel), strides=(stride, stride), padding='same')
+        self.swish2 = Swish()
+        self.bn2 = tf.keras.layers.BatchNormalization()
+
+    def call(self, inputs):
+        x = self.ln1(inputs)
+        x = self.gelu1(x)
+        x = self.dropout1(x)
+        x = self.conv1(x)
+        x = self.swish1(x)
+        x = self.bn1(x)
+
+        x = self.ln2(inputs)
+        x = self.gelu2(x)
+        x = self.dropout2(x)
+        x = self.conv2(x)
+        x = self.swish2(x)
+        x = self.bn2(x)
+
+        x += inputs
+
+        return x
+    
+    def get_config(self):
+        conf = super(ResidualBlock, self).get_config()
+
+        conf.update(self.ln1.get_config())
+        conf.update(self.gelu1.get_config())
+        conf.update(self.dropout1.get_config())
+        conf.update(self.conv1.get_config())
+        conf.update(self.swish1.get_config())
+        conf.update(self.bn1.get_config())
+        
+        conf.update(self.ln2.get_config())
+        conf.update(self.gelu2.get_config())
+        conf.update(self.dropout2.get_config())
+        conf.update(self.conv2.get_config())
+        conf.update(self.swish2.get_config())
+        conf.update(self.bn2.get_config())
+        
+        return conf
+
+class BidirectionalRNN(tf.keras.layers.Layer):
+    def __init__(self, rnn_units, dropout, rnn_type=tf.keras.layers.GRU, return_sequences=True, name='BiGRU', **kwargs):
+        super(BidirectionalRNN, self).__init__(name=name, **kwargs)
+        
+        self.ln = tf.keras.layers.LayerNormalization()
+        self.gelu = GELU()
+        self.gru = rnn_type(rnn_units, recurrent_dropout=0, return_sequences=return_sequences)
+        self.bi_gru = tf.keras.layers.Bidirectional(self.gru)
+        self.dropout = tf.keras.layers.Dropout(dropout)
+        
+
+    def call(self, inputs):
+        x = self.ln(inputs)
+        x = self.gelu(x)
+        x = self.bi_gru(x)
+        x = self.dropout(x)
+
+        return x
+    
+    def get_config(self):
+        conf = super(BidirectionalRNN, self).get_config()
+
+        conf.update(self.ln.get_config())
+        conf.update(self.gelu.get_config())
+        conf.update(self.gru.get_config())
+        conf.update(self.bi_gru.get_config())
+        conf.update(self.dropout.get_config())
+                
+        return conf
 
 class Concatenation(tf.keras.layers.Layer):
     def __init__(self, dmodel, **kwargs):

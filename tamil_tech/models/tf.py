@@ -6,8 +6,8 @@ import tensorflow as tf
 from tamil_tech.encoders import *
 from tamil_tech.layers.tf import *
 from tamil_tech.utils.tf_utils import *
-from tamil_tech.utils.featurizers.speech_featurizer import TFSpeechFeaturizer
-from tamil_tech.utils.featurizers.text_featurizer import TextFeaturizer
+from tamil_tech.utils.featurizers.speech_featurizer import *
+from tamil_tech.utils.featurizers.text_featurizer import *
 from ctc_decoders import ctc_greedy_decoder, ctc_beam_search_decoder
 
 Hypothesis = collections.namedtuple(
@@ -33,17 +33,13 @@ class Model(tf.keras.Model):
         raise NotImplementedError()
 
 class CtcModel(tf.keras.Model):
-    def __init__(self,
-                 base_model: tf.keras.Model,
-                 num_classes: int,
-                 name="ctc_model",
-                 **kwargs):
+    def __init__(self, base_model: tf.keras.Model, num_classes: int, name="ctc_model", **kwargs):
         super(CtcModel, self).__init__(name=name, **kwargs)
         self.base_model = base_model
         # Fully connected layer
         self.fc = tf.keras.layers.Dense(units=num_classes, activation="linear",
                                         use_bias=True, name=f"{name}_fc")
-
+                                        
     def _build(self, input_shape):
         features = tf.keras.Input(input_shape, dtype=tf.float32)
         self(features, training=False)
@@ -298,6 +294,86 @@ class TransducerJoint(tf.keras.Model):
         conf.update(self.ffn_pred.get_config())
         conf.update(self.ffn_out.get_config())
         return conf
+
+class TamilASRBaseModel(tf.keras.Model):
+    def __init__(self, input_shape, num_channels=1, num_cnn_layers=3, num_rnn_layers=5, rnn_dim=512, n_class=64, dropout=0.1, add_out_layer=False, name='tamil_ASR', **kwargs):
+        super(TamilASRBaseModel, self).__init__(name=name, **kwargs)
+
+        self.inp_shape = input_shape
+        self.num_channels = num_channels
+        self.add_out_layer = add_out_layer
+
+        self.conv1 = tf.keras.layers.Conv2D(32, kernel_size=(3, 3), strides=(1, 1), padding='same', activation=tf.nn.swish, input_shape=input_shape)
+
+        self.residual_blocks = [ResidualBlock(32, 3, 1, 0.1, name=f'residual_block_{i}') for i in range(num_cnn_layers)]
+
+        self.fc1 = tf.keras.layers.Dense(rnn_dim, activation=tf.keras.activations.swish)
+
+        self.birnn_layers = [
+            BidirectionalRNN(rnn_units=rnn_dim, dropout=dropout, name=f'BiGRU_{i}')
+            for i in range(num_rnn_layers)
+        ]
+
+        self.fc1 = tf.keras.layers.Dense(rnn_dim)
+        self.fc1_act = GELU()
+        self.drop1 = tf.keras.layers.Dropout(dropout)
+
+        if self.add_out_layer:
+            self.fc_out = tf.keras.layers.Dense(n_class)
+        
+        self.build(input_shape=input_shape)
+
+    def call(self, inputs, training=False, **kwargs):
+        outputs = self.conv1(inputs)
+        for residual_block in self.residual_blocks:
+            outputs = residual_block(outputs)
+        outputs = merge_two_last_dims(outputs)
+        for rnn_block in self.birnn_layers:
+            outputs = rnn_block(outputs)
+        outputs = self.fc1(outputs)
+        outputs = self.fc1_act(outputs)
+        outputs = self.drop1(outputs)
+        if self.add_out_layer:
+            outputs = self.fc_out(outputs)
+        return outputs
+    
+    def get_config(self):
+        conf = super(TamilASRBaseModel, self).get_config()
+
+        conf.update(self.conv1.get_config())
+        for residual_block in self.residual_blocks:
+            conf.update(residual_block.get_config())
+        conf.update(self.fc1.get_config())
+        for birnn_block in self.birnn_layers:
+            conf.update(birnn_block.get_config())
+        conf.update(self.fc1.get_config())
+        conf.update(self.fc1_act.get_config())
+        conf.update(self.drop1.get_config())
+        if self.add_out_layer:
+            conf.update(self.fc_out.get_config())
+        
+        return conf
+
+# TamilASRModel = CtcModel(base_model=TamilASRBaseModel(), num_classes=64, name='tamil_asr_ctc_model')
+
+def TamilASRModel(input_shape=(None, 512, 512, 1), 
+                num_channels=1, 
+                num_cnn_layers=3, 
+                num_rnn_layers=5, 
+                rnn_dim=512, 
+                num_classes=64, 
+                dropout=0.1, 
+                add_out_layer=False, 
+                name='tamil_asr_ctc_model'):
+    return CtcModel(base_model=TamilASRBaseModel(input_shape=(None, 512, 512, 1), 
+                num_channels=1, 
+                num_cnn_layers=3, 
+                num_rnn_layers=5, 
+                rnn_dim=512, 
+                n_class=64, 
+                dropout=0.1, 
+                add_out_layer=False), num_classes=num_classes, name=name)
+
 
 class Transducer(Model):
     """ Transducer Model Warper """
