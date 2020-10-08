@@ -1,0 +1,12 @@
+Deep Speech 2 - https://arxiv.org/pdf/1512.02595.pdf
+Deep Residual Learning For Image Recognition (ResNet paper for Residual Blocks) - https://arxiv.org/pdf/1512.03385.pdf
+Speech Transformer no-recurrence sequence to sequence - http://150.162.46.34:8080/icassp2018/ICASSP18_USB/pdfs/0005884.pdf
+RNN Transducer - https://arxiv.org/pdf/1211.3711.pdf
+Conformer Transformer - https://arxiv.org/pdf/2005.08100.pdf
+Attention Is All You Need - https://arxiv.org/abs/1706.03762
+Self Attention With Relative Position Representations - https://arxiv.org/pdf/1803.02155v2.pdf
+Transformer-XL: Attentive Language Models Beyond a Fixed Length Context - https://arxiv.org/pdf/1901.02860.pdf
+Cold Fusion: Training Seq2Seq Models Together with Language Models - https://arxiv.org/pdf/1708.06426.pdf
+Mitsubishi's Streaming Speech Recognition Transformer - https://www.merl.com/publications/docs/TR2020-040.pdf
+Time Restricted Self Attention - https://www.danielpovey.com/files/2018_icassp_attention.pdf
+Triggered Attention - https://www.merl.com/publications/docs/TR2019-015.pdf
