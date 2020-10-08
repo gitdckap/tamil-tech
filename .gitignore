@@ -15,3 +15,6 @@ test
 demo-Copy1.ipynb
 Untitled.ipynb
 test.py
+tamil_tech/tf/__pycache__
+tamil_tech/torch/__pycache__
+tamil_tech/tf/utils/__pycache__
