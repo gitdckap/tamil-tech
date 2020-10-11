@@ -18,6 +18,7 @@ import torch.nn.functional as F
 import torch.utils.data as data
 import matplotlib.pyplot as plt
 from tamil_tech.torch.models import *
+from tamil_tech.torch.transforms import *
 from torch.utils.data import DataLoader, Dataset
 
 def get_words(sentence):
@@ -185,10 +186,6 @@ class TextTransform:
         
         return ''.join(utf8.get_letters(''.join(string).replace('<SPACE>', ' ')))
 
-train_audio_transforms = torchaudio.transforms.MelSpectrogram(sample_rate=48000, n_mels=128, normalized=True)
-
-valid_audio_transforms = torchaudio.transforms.MelSpectrogram(sample_rate=48000, n_mels=128, normalized=True)
-
 text_transform = TextTransform()
 
 class OpenSLRDataset(Dataset):
@@ -226,11 +223,42 @@ class OpenSLRDataset(Dataset):
     
     return wave, sr, utterances, speaker, index, index
 
+class TamilAudioDataset(Dataset):
+  def __init__(self, directory, filename, mode='train'):
+    if mode == 'train':
+      self.transforms = train_audio_transforms
+    elif mode in ['test', 'dev']:
+      self.transforms = valid_audio_transforms
+    else:
+      raise Exception("Invalid mode selected. Select train, dev, or test")
+
+    self.directory = directory
+    self.filename = filename
+
+    self.df = pd.read_csv(os.path.join(directory, filename), delimiter='\t', encoding='utf-8')
+
+    self.filenames = self.df.PATH.values.tolist()
+    self.labelss = self.df.TRASCRIPT.values.tolist()
+    self.durations = self.df.DURATION.values.tolist()
+  
+  def __len__(self):
+    return len(self.df)
+  
+  def __getitem__(self, index):
+    audio_path = self.directory + '/' + self.filenames[index]
+    utterances = self.labels[index]
+    duration = self.durations[index]
+
+    wave, sr = torchaudio.load(audio_path)
+    
+    return wave, sr, utterances, duration, index, index
+
 def data_processing(data, data_type="train"):
     spectrograms = []
     labels = []
     input_lengths = []
     label_lengths = []
+    
     for (waveform, _, utterance, _, _, _) in data:
         if data_type == 'train':
             spec = train_audio_transforms(waveform).squeeze(0).transpose(0, 1)
@@ -289,6 +317,9 @@ def GreedyDecoder(output, labels=None, label_lengths=None, blank_label=0, collap
       decodes.append(text_transform.int_to_text(decode))
     
     return decodes
+
+def save_checkpoint(state, filename='./models/tamil_tts.pt'):
+  torch.save(state, filename)
 
 def download_file_from_google_drive(id, destination):
     URL = "https://docs.google.com/uc?export=download"

@@ -57,34 +57,32 @@ class ResidualBlock(nn.Module):
         super(ResidualBlock, self).__init__()
 
         self.ln1 = LayerNorm(n_feats)
-        self.swish1 = Swish()
-        self.cnn1 = nn.Conv2d(in_channels, out_channels, kernel, stride, padding=kernel//2)
-        self.swish2 = Swish()
         self.dropout1 = nn.Dropout(p=dropout)
+        self.cnn1 = nn.Conv2d(in_channels, out_channels, kernel, stride, padding=kernel//2)
+        self.swish1 = Swish()
         self.bn1 = nn.BatchNorm2d(out_channels)
 
         self.ln2 = LayerNorm(n_feats)
-        self.swish3 = Swish()
+        self.dropout2 = nn.Dropout(p=dropout)   
         self.cnn2 = nn.Conv2d(out_channels, out_channels, kernel, stride, padding=kernel//2)    
-        self.swish4 = Swish()
-        self.dropout2 = nn.Dropout(p=dropout)        
+        self.swish2 = Swish()     
         self.bn2 = nn.BatchNorm2d(out_channels)
 
     def forward(self, x):
         residual = x  
         
         x = self.ln1(x)
-        x = self.swish1(x)
-        x = self.cnn1(x)
-        x = self.swish2(x)
+        x = F.gelu(x)
         x = self.dropout1(x)
+        x = self.cnn1(x)
+        x = self.swish1(x)
         x = self.bn1(x)
         
         x = self.ln2(x)
-        x = self.swish3(x)
-        x = self.cnn2(x)
-        x = self.swish4(x)
+        x = F.gelu(x)
         x = self.dropout2(x)
+        x = self.cnn2(x)
+        x = self.swish2(x)
         x = self.bn2(x)
         
         x += residual
@@ -105,12 +103,16 @@ class BidirectionalRNN(nn.Module):
         
         self.dropout = nn.Dropout(dropout)
 
+        self.bn = nn.BatchNorm1d(hidden_size)
+
     def forward(self, x):
         x = self.layer_norm(x)
         x = self.swish(x)
         x, _ = self.BiGRU(x)
         x = self.dropout(x)
-        
+        x = self.bn(x)
+        x = F.gelu(x)
+
         return x
 
 class LayerNormalization(nn.Module):
