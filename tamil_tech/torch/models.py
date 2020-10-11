@@ -71,10 +71,7 @@ class ExperimentalASR(nn.Module):
     
     def forward(self, x):      
         x = self.resnet(x)
-        
-        sizes = x.size()
-        x = x.view(sizes[0], sizes[1] * sizes[2], sizes[3])  
-        
+                
         x = x.transpose(1, 2) 
         x = self.pointwise(x)
         x = self.birnn_blocks(x)
