@@ -88,11 +88,11 @@ def test_one_epoch(model, device, test_loader, criterion, epoch, experiment, mod
 
     return test_loss
 
-def train(epochs, model, device, train_loader, dev_loader, criterion, optimizer, scheduler, epoch, experiment, validate=True, checkpoint=False, checkpoint_path='/content/drive/My Drive/models'):
+def train(epochs, model, device, train_loader, dev_loader, criterion, optimizer, scheduler, epoch, experiment, validate=True, checkpoint=False, checkpoint_path='/content/drive/My Drive/models', model_name='tamil_asr_new'):
   best_prec = 5
 
   print("Training...")
-  
+
   for epoch in range(1, epochs + 1):
     # empty GPU cache
     torch.cuda.empty_cache()
@@ -120,4 +120,4 @@ def train(epochs, model, device, train_loader, dev_loader, criterion, optimizer,
                 'epoch': epoch,
                 'state_dict': model.state_dict(),
                 'best_prec': best_prec,
-        }, filename=os.path.join(checkpoint_path, f'tamil_asr_v3_epoch_{epoch}.pt'))
+        }, filename=os.path.join(checkpoint_path, model_name + f'_{epoch}.pt'))
