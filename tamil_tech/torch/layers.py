@@ -103,14 +103,11 @@ class BidirectionalRNN(nn.Module):
         
         self.dropout = nn.Dropout(dropout)
 
-        self.bn = nn.BatchNorm1d(hidden_size)
-
     def forward(self, x):
         x = self.layer_norm(x)
         x = self.swish(x)
         x, _ = self.BiGRU(x)
         x = self.dropout(x)
-        x = self.bn(x)
         x = F.gelu(x)
 
         return x
