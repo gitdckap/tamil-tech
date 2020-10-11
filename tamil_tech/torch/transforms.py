@@ -2,7 +2,7 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 from torchvision import transforms as T
-from torchaudio import FrequencyMasking, TimeMasking, transforms
+from torchaudio import transforms
 
 class SpecAug(nn.Module):
     def __init__(self, freq_len=1, time_len=10, freq_mask=27, time_mask=100):
@@ -14,8 +14,8 @@ class SpecAug(nn.Module):
         self.freq_mask = freq_mask
         self.time_mask = time_mask
 
-        self.freq_aug = FrequencyMasking(freq_mask_param=self.freq_len)
-        self.time_aug = TimeMasking(time_mask_param=self.time_len)
+        self.freq_aug = transforms.FrequencyMasking(freq_mask_param=self.freq_len)
+        self.time_aug = transforms.TimeMasking(time_mask_param=self.time_len)
     
     def __call__(self, x):
         x = self.freq_aug(x, mask_value=self.freq_mask)
