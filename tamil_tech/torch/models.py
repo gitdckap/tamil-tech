@@ -59,8 +59,8 @@ class ExperimentalASR(nn.Module):
         for param in self.resnet.parameters():
               param.requires_grad = True
 
-        self.resnet = list(self.resnet.children())[:-2]
-        self.resnet = nn.Sequential(*self.resnet)
+        _res = list(self.resnet.children())[:-2]
+        self.resnet = nn.Sequential(_res)
 
         self.pointwise = nn.Linear(n_inputs, rnn_dim)
         self.birnn_blocks = nn.Sequential(*[BidirectionalRNN(rnn_dim=rnn_dim if i==0 else rnn_dim*2, hidden_size=rnn_dim, dropout=dropout, batch_first=i==0) for i in range(n_rnn_layers)])
