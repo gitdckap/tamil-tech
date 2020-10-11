@@ -62,7 +62,7 @@ class ExperimentalASR(nn.Module):
         _res = list(self.resnet.children())[:-2]
         self.resnet = nn.Sequential(*_res)
 
-        self.pointwise = nn.Linear(n_inputs, rnn_dim)
+        self.pointwise = nn.Linear(2048, rnn_dim)
         self.birnn_blocks = nn.Sequential(*[BidirectionalRNN(rnn_dim=rnn_dim if i==0 else rnn_dim*2, hidden_size=rnn_dim, dropout=dropout, batch_first=i==0) for i in range(n_rnn_layers)])
         
         self.classifier = nn.Sequential(
@@ -76,8 +76,8 @@ class ExperimentalASR(nn.Module):
                 
         sizes = x.size()
         x = x.view(sizes[0], sizes[1] * sizes[2], sizes[3]) 
-        
-        x = x.transpose(1, 2) 
+
+        x = x.transpose(1, 2)
         x = self.pointwise(x)
         x = self.birnn_blocks(x)
         x = self.classifier(x)
