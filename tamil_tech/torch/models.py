@@ -72,8 +72,6 @@ class ExperimentalASR(nn.Module):
     def forward(self, x):      
         x = self.resnet(x)
                 
-        x = x.transpose(1, 2) 
-        x = self.pointwise(x)
         x = self.birnn_blocks(x)
         x = self.classifier(x)
         
