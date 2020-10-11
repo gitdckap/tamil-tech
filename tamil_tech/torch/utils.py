@@ -238,7 +238,7 @@ class TamilAudioDataset(Dataset):
     self.df = pd.read_csv(os.path.join(directory, filename), delimiter='\t', encoding='utf-8')
 
     self.filenames = self.df.PATH.values.tolist()
-    self.labelss = self.df.TRANSCRIPT.values.tolist()
+    self.labels = self.df.TRANSCRIPT.values.tolist()
     self.durations = self.df.DURATION.values.tolist()
   
   def __len__(self):
