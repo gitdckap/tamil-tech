@@ -88,7 +88,7 @@ def test_one_epoch(model, device, test_loader, criterion, epoch, experiment, mod
 
     return test_loss
 
-def train(epochs, model, device, train_loader, dev_loader, criterion, optimizer, scheduler, epoch, experiment, validate=True, checkpoint=False, checkpoint_path='/content/drive/My Drive/models', model_name='tamil_asr_new'):
+def train(epochs, model, device, train_loader, dev_loader, criterion, optimizer, scheduler, experiment, validate=True, checkpoint=False, checkpoint_path='/content/drive/My Drive/models', model_name='tamil_asr_new'):
   best_prec = 5
 
   print("Training...")
