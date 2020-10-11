@@ -56,11 +56,13 @@ class ExperimentalASR(nn.Module):
         
         n_inputs = self.resnet.fc.in_features
 
-        self.resnet.fc = nn.Linear(n_inputs, rnn_dim)
-
         for param in self.resnet.parameters():
               param.requires_grad = True
 
+        self.resnet = list(self.resnet.children())[:-2]
+        self.resnet = nn.Sequential(*self.resnet)
+
+        self.pointwise = nn.Linear(n_inputs, rnn_dim)
         self.birnn_blocks = nn.Sequential(*[BidirectionalRNN(rnn_dim=rnn_dim if i==0 else rnn_dim*2, hidden_size=rnn_dim, dropout=dropout, batch_first=i==0) for i in range(n_rnn_layers)])
         
         self.classifier = nn.Sequential(
@@ -72,6 +74,8 @@ class ExperimentalASR(nn.Module):
     def forward(self, x):      
         x = self.resnet(x)
                 
+        x = x.transpose(1, 2) 
+        x = self.pointwise(x)
         x = self.birnn_blocks(x)
         x = self.classifier(x)
         
