@@ -42,7 +42,7 @@ class CustomCNNbiRNN(nn.Module):
         return x
 
 class ExperimentalASR(nn.Module):
-    def __init__(self, n_rnn_layers, rnn_dim, n_class, stride=2, dropout=0.1, training=True, resnet='resnet18'):
+    def __init__(self, n_rnn_layers, rnn_dim, n_class, dropout=0.1, training=True, resnet='resnet18'):
         super(ExperimentalASR, self).__init__()
 
         if resnet == 'resnet18':
