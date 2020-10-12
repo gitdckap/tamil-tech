@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models import resnet18, resnet50
 from tamil_tech.torch.layers import *
+from tamil_tech.torch.encoders import *
 
 class CustomCNNbiRNN(nn.Module):
     def __init__(self, n_cnn_layers, n_rnn_layers, rnn_dim, n_class, n_feats, stride=2, dropout=0.1, training=True):
@@ -106,7 +107,7 @@ class TamilASRModel(nn.Module):
         ])
         
         self.classifier = nn.Sequential(
-            nn.Linear(rnn_dim*2, rnn_dim),  # birnn returns rnn_dim*2
+            nn.Linear(rnn_dim*2, rnn_dim),  
             nn.GELU(),
             nn.Dropout(dropout),
             nn.Linear(rnn_dim, n_class)
@@ -125,3 +126,22 @@ class TamilASRModel(nn.Module):
         x = self.classifier(x)
         
         return x
+
+class ConformerTransducer(nn.Module):
+  def __init__(self, vocab_size=64, in_feat=128, conv_kernel_size=32, embed_dim=144, num_heads=4, dropout=0.1, n_feats=128, num_encoders=16, decoder_dim=320, num_decoders=1, decoder=nn.GRU, mask=None, batch_first=True):
+    super(ConformerTransducer, self).__init__()
+
+    self.encoder = ConformerEncoder(in_feat, conv_kernel_size, embed_dim, num_heads, dropout, num_encoders, n_feats, mask, batch_first)
+
+    self.decoder = decoder(embed_dim, decoder_dim, num_layers=num_decoders, dropout=dropout, bidirectional=False, batch_first=batch_first)
+
+    self.fc = nn.Sequential(nn.Linear(decoder_dim, decoder_dim),
+                            Swish(),
+                            nn.Linear(decoder_dim, vocab_size))
+  
+  def forward(self, x):
+    x = self.encoder(x)
+    x, states = self.decoder(x)
+    x = self.fc(x)
+
+    return x, states
