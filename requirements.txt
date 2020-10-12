@@ -11,3 +11,5 @@ pyaudio==0.2.8
 librosa==0.8.0
 tensorflow_datasets==3.2.1
 tensorflow-addons==0.11.2
+warp-rnnt==0.4.0
+nlpaug==1.0.1
