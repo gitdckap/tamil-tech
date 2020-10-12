@@ -13,9 +13,9 @@ class ConformerEncoder(nn.Module):
 
     self.dropout = nn.Dropout(dropout)
 
-    self.conformer_encoders = [
+    self.conformer_encoders = nn.Sequential(*[
       ConformerEncoderlayer(embed_dim, embed_dim, num_heads=num_heads, dropout=dropout, n_feats=n_feats) for _ in range(num_encoders)
-    ]
+    ])
 
     self.mask = mask
 
@@ -26,7 +26,6 @@ class ConformerEncoder(nn.Module):
     x = F.gelu(x)
     x = self.dropout(x)
 
-    for block in self.conformer_encoders:
-      x = block(x)
+    x = self.conformer_encoders(x)
 
     return x
