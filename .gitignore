@@ -18,3 +18,7 @@ test.py
 tamil_tech/tf/__pycache__
 tamil_tech/torch/__pycache__
 tamil_tech/tf/utils/__pycache__
+tamil_conformer_M.h5
+tamil_conformer_tflite_M.tflite
+tamil_conformer_tflite_True_M.tflite
+conformer_demo.ipynb
