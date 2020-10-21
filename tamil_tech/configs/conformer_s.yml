@@ -24,7 +24,7 @@ model_config:
     filters: 144
     kernel_size: 3
     strides: 2
-  positional_encoding: subsampling
+  positional_encoding: sinusoid_concat
   dmodel: 144
   num_blocks: 16
   head_size: 36
@@ -34,7 +34,7 @@ model_config:
   fc_factor: 0.5
   dropout: 0.1
   embed_dim: 320
-  embed_dropout: 0.1
+  embed_dropout: 0.05
   num_rnns: 1
   rnn_units: 320
   rnn_type: lstm
@@ -47,7 +47,7 @@ learning_config:
       time_masking:
         num_masks: 10
         mask_factor: 100
-        p_upperbound: 0.05
+        p_upperbound: 0.2
       freq_masking:
         num_masks: 1
         mask_factor: 27
@@ -60,17 +60,17 @@ learning_config:
     test_paths:
       - data/oslr_test.tsv
     tfrecords_dir: null
-
+    
   optimizer_config:
     warmup_steps: 10000
     beta1: 0.9
     beta2: 0.98
     epsilon: 1e-9
-
+  
   running_config:
-    batch_size: 12
-    num_epochs: 30
-    outdir: trained_models/tamil_conformer_S
-    log_interval_steps: 300
-    eval_interval_steps: 500
-    save_interval_steps: 1000
+    batch_size: 16
+    num_epochs: 22
+    outdir: trained_models/tamil_conformer_S_v1
+    log_interval_steps: 1000
+    eval_interval_steps: 1000
+    save_interval_steps: 2000
