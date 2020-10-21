@@ -6,7 +6,7 @@ import tensorflow as tf
 from tamil_tech.tf.encoders import *
 from tamil_tech.tf.layers import *
 from tamil_tech.tf.utils import *
-#from ctc_decoders import ctc_greedy_decoder, ctc_beam_search_decoder
+from ctc_decoders import ctc_greedy_decoder, ctc_beam_search_decoder
 
 Hypothesis = collections.namedtuple(
     "Hypothesis",
