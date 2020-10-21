@@ -418,7 +418,7 @@ class PositionalEncodingConcat(tf.keras.layers.Layer):
         return tf.cast(pe, dtype=inputs.dtype)
 
     def get_config(self):
-        conf = super(PositionalEncoding, self).get_config()
+        conf = super(PositionalEncodingConcat, self).get_config()
         return conf
 
 class VggSubsampling(tf.keras.layers.Layer):

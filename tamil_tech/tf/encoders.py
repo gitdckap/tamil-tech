@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tamil_tech.tf.layers import *
 
-class ConformerEncoder(tf.keras.Model):
+class ConformerEncoder(tf.keras.layers.Layer):
     def __init__(self,
                  subsampling,
                  positional_encoding="sinusoid",
@@ -25,8 +25,10 @@ class ConformerEncoder(tf.keras.Model):
             subsampling_class = VggSubsampling
         elif subsampling_name == "conv2d":
             subsampling_class = Conv2dSubsampling
+        elif subsampling_name == 'residual':
+            subsampling_class = ResidualBlock
         else:
-            raise ValueError("subsampling must be either  'conv2d' or 'vgg'")
+            raise ValueError("subsampling must be either  'conv2d' or 'vgg' or 'residual'")
 
         self.conv_subsampling = subsampling_class(
             **subsampling, name=f"{name}_subsampling",
@@ -86,3 +88,61 @@ class ConformerEncoder(tf.keras.Model):
         for cblock in self.conformer_blocks:
             conf.update(cblock.get_config())
         return conf
+
+# def conformer_s_encoder(self,
+#                  subsampling,
+#                  positional_encoding="sinusoid",
+#                  dmodel=144,
+#                  num_blocks=16,
+#                  mha_type="relmha",
+#                  head_size=36,
+#                  num_heads=4,
+#                  kernel_size=32,
+#                  depth_multiplier=1,
+#                  fc_factor=0.5,
+#                  dropout=0.0,
+#                  kernel_regularizer=L2,
+#                  bias_regularizer=L2,
+#                  name="conformer_encoder"):
+
+#     conv_subsampling = Conv2dSubsampling(
+#             **subsampling, name=f"{name}_subsampling",
+#             kernel_regularizer=kernel_regularizer,
+#             bias_regularizer=bias_regularizer
+#         )
+    
+#     conformer_blocks = []
+    
+#     for i in range(num_blocks):
+#         conformer_block = ConformerBlock(
+#             input_dim=dmodel,
+#             dropout=dropout,
+#             fc_factor=fc_factor,
+#             head_size=head_size,
+#             num_heads=num_heads,
+#             mha_type=mha_type,
+#             kernel_size=kernel_size,
+#             depth_multiplier=depth_multiplier,
+#             kernel_regularizer=kernel_regularizer,
+#             bias_regularizer=bias_regularizer,
+#             name=f"{name}_block_{i}"
+#         )
+        
+#         conformer_blocks.append(conformer_block)
+    
+#     linear = tf.keras.layers.Dense(
+#             dmodel, name=f"{name}_linear",
+#             kernel_regularizer=kernel_regularizer,
+#             bias_regularizer=bias_regularizer
+#         )
+    
+#     do = tf.keras.layers.Dropout(dropout, name=f"{name}_dropout")
+
+#     outputs = conv_subsampling(inputs, training=training)
+#     outputs = linear(outputs, training=training)
+#     pe = pe(outputs)
+#     outputs = do(outputs, training=training)
+#     for cblock in conformer_blocks:
+#         outputs = cblock([outputs, pe], training=training)
+#     return outputs
+

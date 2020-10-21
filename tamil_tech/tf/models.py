@@ -6,7 +6,7 @@ import tensorflow as tf
 from tamil_tech.tf.encoders import *
 from tamil_tech.tf.layers import *
 from tamil_tech.tf.utils import *
-from ctc_decoders import ctc_greedy_decoder, ctc_beam_search_decoder
+#from ctc_decoders import ctc_greedy_decoder, ctc_beam_search_decoder
 
 Hypothesis = collections.namedtuple(
     "Hypothesis",
@@ -738,6 +738,75 @@ class Transducer(Model):
             ]
         )
 
+def ConformerModel(
+                  input_shape: tuple =(None, 80, 1),
+                  subsampling: dict = {'type': 'conv2d',
+                      'filters': 144,
+                      'kernel_size': 3,
+                      'strides': 2},
+                  positional_encoding: str = "sinusoid_concat",
+                  dmodel: int = 144,
+                  vocabulary_size: int = 64,
+                  num_blocks: int = 16,
+                  head_size: int = 36,
+                  num_heads: int = 4,
+                  mha_type: str = "relmha",
+                  kernel_size: int = 32,
+                  fc_factor: float = 0.5,
+                  dropout: float = 0.1,
+                  embed_dim: int = 320,
+                  embed_dropout: int = 0.05,
+                  num_rnns: int = 1,
+                  rnn_units: int = 320,
+                  rnn_type: str = "lstm",
+                  layer_norm: bool = True,
+                  joint_dim: int = 320,
+                  kernel_regularizer=L2,
+                  bias_regularizer=L2,
+                  name: str = "conformer_transducer"):
+    
+    inp1 = tf.keras.layers.Input(input_shape)
+    inp2 = tf.keras.layers.Input([None])
+    
+    encoder_pred = ConformerEncoder(
+                  subsampling=subsampling,
+                  positional_encoding=positional_encoding,
+                  dmodel=dmodel,
+                  num_blocks=num_blocks,
+                  head_size=head_size,
+                  num_heads=num_heads,
+                  mha_type=mha_type,
+                  kernel_size=kernel_size,
+                  fc_factor=fc_factor,
+                  dropout=dropout,
+                  kernel_regularizer=kernel_regularizer,
+                  bias_regularizer=bias_regularizer
+              )(inp1)
+    
+    trans_pred = TransducerPrediction(
+              vocabulary_size=vocabulary_size,
+              embed_dim=embed_dim,
+              embed_dropout=embed_dropout,
+              num_rnns=num_rnns,
+              rnn_units=rnn_units,
+              rnn_type=rnn_type,
+              layer_norm=layer_norm,
+              kernel_regularizer=kernel_regularizer,
+              bias_regularizer=bias_regularizer,
+              name=f"{name}_prediction"
+          )(inp2)
+
+    out = TransducerJoint(
+            vocabulary_size=vocabulary_size,
+            joint_dim=joint_dim,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer,
+            name=f"{name}_joint"
+        )([encoder_pred, trans_pred])
+    
+    model = tf.keras.Model(inputs=[inp1, inp2], outputs=out, name='conformer')
+    return model
+    
 class Conformer(Transducer):
     def __init__(self,
                  subsampling: dict,
