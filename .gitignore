@@ -12,6 +12,8 @@ tamil_tech/utils/__pycache__
 tamil_tech/utils/featurizers/__pycache__
 tamil_tech/zero_shot/__pycache__
 test
+config.yml
+tamil_conformer_whole_M.model
 demo-Copy1.ipynb
 Untitled.ipynb
 test.py
@@ -22,3 +24,12 @@ tamil_conformer_M.h5
 tamil_conformer_tflite_M.tflite
 tamil_conformer_tflite_True_M.tflite
 conformer_demo.ipynb
+conf_test.py
+__pycache__
+conformer_s_v1.h5
+conformer_s_v1.tflite
+saved_model.py
+conformer_s_v1_whole.model
+import_graph.py
+tamil_conformer_s_v1_whole.h5
+tamil_conformer_s_js
