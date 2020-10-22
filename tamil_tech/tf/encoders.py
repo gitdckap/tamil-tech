@@ -26,7 +26,7 @@ class ConformerEncoder(tf.keras.layers.Layer):
         elif subsampling_name == "conv2d":
             subsampling_class = Conv2dSubsampling
         elif subsampling_name == 'residual':
-            subsampling_class = ResidualBlock
+            subsampling_class = ResidualSampling
         else:
             raise ValueError("subsampling must be either  'conv2d' or 'vgg' or 'residual'")
 
