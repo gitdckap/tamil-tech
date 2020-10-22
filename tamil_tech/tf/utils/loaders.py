@@ -4,11 +4,12 @@ import yaml
 import requests
 import tensorflow as tf
 from collections import UserDict
-from . import DEFAULT_YAML
 from tamil_tech.tf.models import Conformer 
 from tamil_tech.tf.utils.tf_utils import preprocess_paths, append_default_keys_dict, check_key_in_dict
 from tamil_tech.tf.utils.speech_featurizer import TFSpeechFeaturizer
 from tamil_tech.tf.utils.text_featurizer import CharFeaturizer
+
+DEFAULT_YAML = "tamil_tech/configs/conformer_s.yml"
 
 def load_yaml(path):
     # Fix yaml numbers https://stackoverflow.com/a/30462009/11037553
@@ -58,7 +59,7 @@ class UserConfig(UserDict):
 
 CONFORMER_L = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_l.yml", learning=True)
 CONFORMER_M = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_m.yml", learning=True)
-CONFORMER_S =UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_s.yml", learning=True)
+CONFORMER_S = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_s.yml", learning=True)
 
 def download_file_from_google_drive(id, destination):
     URL = "https://docs.google.com/uc?export=download"

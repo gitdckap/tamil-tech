@@ -6,7 +6,7 @@ import tensorflow as tf
 from tamil_tech.tf.encoders import *
 from tamil_tech.tf.layers import *
 from tamil_tech.tf.utils import *
-from ctc_decoders import ctc_greedy_decoder, ctc_beam_search_decoder
+# from ctc_decoders import ctc_greedy_decoder, ctc_beam_search_decoder
 
 Hypothesis = collections.namedtuple(
     "Hypothesis",
@@ -490,7 +490,7 @@ class Transducer(Model):
 
     # greedy
 
-    @tf.function
+    @tf.function(experimental_relax_shapes=True)
     def recognize(self, features):
         total = tf.shape(features)[0]
         batch = tf.constant(0, dtype=tf.int32)
@@ -621,7 +621,7 @@ class Transducer(Model):
 
     # beam search
 
-    @tf.function
+    @tf.function(experimental_relax_shapes=True)
     def recognize_beam(self, features, lm=False):
         total = tf.shape(features)[0]
         batch = tf.constant(0, dtype=tf.int32)
