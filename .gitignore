@@ -17,9 +17,9 @@ tamil_conformer_whole_M.model
 demo-Copy1.ipynb
 Untitled.ipynb
 test.py
+tamil_tech/torch/
 tamil_tech/tf/__pycache__
 tamil_tech/torch/__pycache__
-tamil_tech/torch/
 tamil_tech/tf/utils/__pycache__
 tamil_conformer_M.h5
 tamil_conformer_tflite_M.tflite
