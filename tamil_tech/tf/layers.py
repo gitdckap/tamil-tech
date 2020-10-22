@@ -177,6 +177,56 @@ class Swish(tf.keras.layers.Layer):
         conf = super(Swish, self).get_config()
         return conf
 
+class ResidualSampling(tf.keras.layers.Layer):
+    def __init__(self,
+                 filters: int,
+                 strides: list or tuple or int = 2,
+                 kernel_size: int or list or tuple = 3,
+                 kernel_regularizer=None,
+                 bias_regularizer=None,
+                 dropout=0.1, 
+                 name='residual_block', 
+                 **kwargs):
+        super(ResidualSampling, self).__init__(name=name, **kwargs)
+        
+        self.ln1 = tf.keras.layers.LayerNormalization()
+        self.gelu1 = GELU()
+        self.dropout1 = tf.keras.layers.Dropout(dropout)
+        self.conv1 = tf.keras.layers.Conv2D(filters, kernel_size=kernel_size, strides=strides, kernel_regularizer=kernel_regularizer, bias_regularizer=bias_regularizer, padding='same')
+
+        self.ln2 = tf.keras.layers.LayerNormalization()
+        self.conv2 = tf.keras.layers.Conv2D(filters, kernel_size=7, strides=strides, kernel_regularizer=kernel_regularizer, bias_regularizer=bias_regularizer, padding='same')
+        
+        self.time_reduction_factor = self.conv1.strides[0] + self.conv2.strides[0]
+
+    def call(self, inputs, training=False, **kwargs):
+        residual = self.ln2(inputs)
+        residual = self.conv2(residual)
+        resiudal = tf.nn.relu(residual)
+        
+        x = self.ln1(inputs)
+        x = self.gelu1(x)
+        x = self.dropout1(x)
+        x = self.conv1(x, training=training)
+        x = tf.nn.swish(x)
+        
+        x += residual
+        
+        return merge_two_last_dims(x)
+
+    def get_config(self):
+        conf = super(ResidualSampling, self).get_config()
+
+        conf.update(self.ln1.get_config())
+        conf.update(self.gelu1.get_config())
+        conf.update(self.dropout1.get_config())
+        conf.update(self.conv1.get_config())
+
+        conf.update(self.ln2.get_config())
+        conf.update(self.conv2.get_config())
+
+        return conf
+
 class ResidualBlock(tf.keras.layers.Layer):
     def __init__(self, units, kernel, stride, dropout, name='residual_block', **kwargs):
         super(ResidualBlock, self).__init__(name=name, **kwargs)
