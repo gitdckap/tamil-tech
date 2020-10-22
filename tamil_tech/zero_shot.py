@@ -86,7 +86,7 @@ class ConformerTamilASRLite(object):
               print('')
 
 class ConformerTamilASR(object):
-    def __init__(self, greedy=False, path='conformer_s_v1.h5'):
+    def __init__(self, greedy=False, path='ConformerS.h5'):
         config = CONFORMER_S
 
         speech_featurizer = TFSpeechFeaturizer(config["speech_config"])
