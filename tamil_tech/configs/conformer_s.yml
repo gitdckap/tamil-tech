@@ -14,7 +14,7 @@ decoder_config:
   target_vocab_size: 64
   max_subword_length: 4
   blank_at_zero: True
-  beam_width: 5
+  beam_width: 6
   norm_score: True
 
 model_config:
