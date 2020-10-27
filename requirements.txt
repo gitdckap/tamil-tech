@@ -14,3 +14,9 @@ tensorflow-addons==0.11.2
 warp-rnnt==0.4.0
 nlpaug==1.0.1
 visdom==0.1.8.9
+fastapi==0.61.1
+uvicorn==0.12.2
+Flask==1.1.2
+logmmse==1.5
+soundfile==0.10.3.post1
+werkzeug==1.0.0
