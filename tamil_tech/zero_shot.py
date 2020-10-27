@@ -2,7 +2,7 @@ import os
 import warnings
 
 warnings.filterwarnings("ignore")
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 import io
 import torch
@@ -115,13 +115,24 @@ class ConformerTamilASR(object):
     def read_raw_audio(self, audio, sample_rate=16000):
         if isinstance(audio, str):
             wave, _ = librosa.load(os.path.expanduser(audio), sr=sample_rate)
+        
         elif isinstance(audio, bytes):
             wave, sr = sf.read(io.BytesIO(audio))
+            
+            try:
+                if wave.shape[1] >= 2:
+                  wave = np.transpose(wave)[0][:]
+            except:
+              pass
+            
             wave = np.asfortranarray(wave)
+
             if sr != sample_rate:
                 wave = librosa.resample(wave, sr, sample_rate)
+        
         elif isinstance(audio, np.ndarray):
             return audio
+        
         else:
             raise ValueError("input audio must be either a path or bytes")
         return wave
