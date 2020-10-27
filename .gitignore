@@ -19,7 +19,6 @@ Untitled.ipynb
 test.py
 tamil_tech/torch/
 tamil_tech/tf/__pycache__
-tamil_tech/torch/__pycache__
 tamil_tech/tf/utils/__pycache__
 tamil_conformer_M.h5
 tamil_conformer_tflite_M.tflite
@@ -36,3 +35,4 @@ tamil_conformer_s_v1_whole.h5
 tamil_conformer_s_js
 tests/
 tcd.ipynb
+api/
