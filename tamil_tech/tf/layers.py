@@ -331,6 +331,98 @@ class Concatenation(tf.keras.layers.Layer):
         conf.update(self.joint.get_config())
         return conf
 
+class TimeReduction(tf.keras.layers.Layer):
+    def __init__(self, factor: int, name: str = "TimeReduction", **kwargs):
+        super(TimeReduction, self).__init__(name=name, **kwargs)
+        self.time_reduction_factor = factor
+
+    def padding(self, time):
+        new_time = tf.math.ceil(time / self.time_reduction_factor) * self.time_reduction_factor
+        return tf.cast(new_time, dtype=tf.int32) - time
+
+    def call(self, inputs, **kwargs):
+        shape = shape_list(inputs)
+        outputs = tf.pad(inputs, [[0, 0], [0, self.padding(shape[1])], [0, 0]])
+        outputs = tf.reshape(outputs, [shape[0], -1, shape[-1] * self.time_reduction_factor])
+        return outputs
+
+    def get_config(self):
+        config = super(TimeReduction, self).get_config()
+        config.update({"factor": self.time_reduction_factor})
+        return config
+
+class Reshape(tf.keras.layers.Layer):
+    def call(self, inputs): return merge_two_last_dims(inputs)
+
+class StreamingTransducerBlock(tf.keras.Model):
+    def __init__(self,
+                 reduction_factor: int = 0,
+                 dmodel: int = 640,
+                 rnn_type: str = "lstm",
+                 rnn_units: int = 2048,
+                 layer_norm: bool = True,
+                 kernel_regularizer=None,
+                 bias_regularizer=None,
+                 **kwargs):
+        super(StreamingTransducerBlock, self).__init__(**kwargs)
+
+        if reduction_factor > 0:
+            self.reduction = TimeReduction(reduction_factor, name=f"{self.name}_reduction")
+        else:
+            self.reduction = None
+
+        RNN = get_rnn(rnn_type)
+        self.rnn = RNN(
+            units=rnn_units, return_sequences=True,
+            name=f"{self.name}_rnn", return_state=True,
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer
+        )
+
+        if layer_norm:
+            self.ln = tf.keras.layers.LayerNormalization(name=f"{self.name}_ln")
+        else:
+            self.ln = None
+
+        self.projection = tf.keras.layers.Dense(
+            dmodel, name=f"{self.name}_projection",
+            kernel_regularizer=kernel_regularizer,
+            bias_regularizer=bias_regularizer
+        )
+
+    def call(self, inputs, training=False):
+        outputs = inputs
+        if self.reduction is not None:
+            outputs = self.reduction(outputs)
+        outputs = self.rnn(outputs, training=training)
+        outputs = outputs[0]
+        if self.ln is not None:
+            outputs = self.ln(outputs, training=training)
+        outputs = self.projection(outputs, training=training)
+        return outputs
+
+    def recognize(self, inputs, states):
+        outputs = inputs
+        if self.reduction is not None:
+            outputs = self.reduction(outputs)
+        outputs = self.rnn(outputs, training=False, initial_state=states)
+        new_states = tf.stack(outputs[1:], axis=0)
+        outputs = outputs[0]
+        if self.ln is not None:
+            outputs = self.ln(outputs, training=False)
+        outputs = self.projection(outputs, training=False)
+        return outputs, new_states
+
+    def get_config(self):
+        conf = {}
+        if self.reduction is not None:
+            conf.update(self.reduction.get_config())
+        conf.update(self.rnn.get_config())
+        if self.ln is not None:
+            conf.update(self.ln.get_config())
+        conf.update(self.projection.get_config())
+        return conf
+
 class GLU(tf.keras.layers.Layer):
     def __init__(self,
                  axis=-1,
