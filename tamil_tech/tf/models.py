@@ -352,8 +352,6 @@ class TamilASRBaseModel(tf.keras.Model):
         
         return conf
 
-# TamilASRModel = CtcModel(base_model=TamilASRBaseModel(), num_classes=64, name='tamil_asr_ctc_model')
-
 def TamilASRModel(input_shape=(None, 512, 512, 1), 
                 num_channels=1, 
                 num_cnn_layers=3, 
@@ -371,7 +369,6 @@ def TamilASRModel(input_shape=(None, 512, 512, 1),
                 n_class=64, 
                 dropout=0.1, 
                 add_out_layer=False), num_classes=num_classes, name=name)
-
 
 class Transducer(Model):
     """ Transducer Model Warper """

@@ -60,6 +60,7 @@ class UserConfig(UserDict):
 CONFORMER_L = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_l.yml", learning=True)
 CONFORMER_M = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_m.yml", learning=True)
 CONFORMER_S = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_s.yml", learning=True)
+CONFORMER_S_V2 = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_s_v2.yml", learning=True)
 
 def download_file_from_google_drive(id, destination):
     URL = "https://docs.google.com/uc?export=download"
