@@ -142,7 +142,7 @@ class ConformerTamilASR(object):
     def bytes_to_string(self, array: np.ndarray, encoding: str = "utf-8"):
         return [transcript.decode(encoding) for transcript in array]
 
-    def infer(self, path):
+    def infer(self, path, return_text=False):
         signal = self.read_raw_audio(path)
         signal = tf.expand_dims(self.model.speech_featurizer.tf_extract(signal), axis=0)
         if self.greedy:
@@ -150,6 +150,9 @@ class ConformerTamilASR(object):
         else:
           pred = self.model.recognize_beam(features=signal, lm=True)
 
+        if return_text:
+          return self.bytes_to_string(pred.numpy())[0]
+        
         print(self.bytes_to_string(pred.numpy())[0], end=' ')
     
     def infer_dir(self, directory=None):
