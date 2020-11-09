@@ -2,7 +2,7 @@ import os
 import warnings
 
 warnings.filterwarnings("ignore")
-# os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 import io
 import torch
@@ -17,7 +17,7 @@ from tamil_tech.torch.models import *
 
 import numpy as np
 import tensorflow as tf
-from tamil_tech.tf.utils import TFSpeechFeaturizer, CharFeaturizer, preprocess_paths, check_key_in_dict, append_default_keys_dict, CONFORMER_L, CONFORMER_M, CONFORMER_S, load_conformer_model, download_file_from_google_drive
+from tamil_tech.tf.utils import TFSpeechFeaturizer, CharFeaturizer, preprocess_paths, check_key_in_dict, append_default_keys_dict, CONFORMER_L, CONFORMER_M, CONFORMER_S, CONFORMER_S_V2, CONFORMER_S_UPDATED, load_conformer_model, download_file_from_google_drive
 from tamil_tech.tf.models import Conformer
 
 class ConformerTamilASRLite(object):
@@ -80,15 +80,15 @@ class ConformerTamilASRLite(object):
         print("".join([chr(u) for u in hyp]), end=' ')
     
     def infer_dir(self, directory=None):
-        for root, dirs, files in os.walk(directory):
+        for root, _, files in os.walk(directory):
             for file in files:
               print(f"Filename: {file} | ", end='')
               self.infer(os.path.join(root, file))
               print('')
 
 class ConformerTamilASR(object):
-    def __init__(self, greedy=False, path='ConformerSv2.h5'):
-        config = CONFORMER_S_V2
+    def __init__(self, greedy=False, path='ConformerSupdated.h5'):
+        config = CONFORMER_S_UPDATED
 
         speech_featurizer = TFSpeechFeaturizer(config["speech_config"])
         text_featurizer = CharFeaturizer(config["decoder_config"])
@@ -97,9 +97,8 @@ class ConformerTamilASR(object):
           pass
         else:
           print("Downloading Model...")
-          file_id = '1Iy6uwYvMo5KvwbUv4L4EMNFasepGpDmf'
-          new_id = '1dw0TwOEgzlvOBl2aHx8OefKXX-MgF76N'
-          download_file_from_google_drive(new_id, path)
+          file_id = config["file_id"]
+          download_file_from_google_drive(file_id, path)
           print("Downloaded Model Successfully...")
         
         self.model = Conformer(
@@ -156,7 +155,7 @@ class ConformerTamilASR(object):
         print(self.bytes_to_string(pred.numpy())[0], end=' ')
     
     def infer_dir(self, directory=None):
-      for root, dirs, files in os.walk(directory):
+      for root, _, files in os.walk(directory):
           for file in files:
             print(f"Filename: {file} | ", end='')
             self.infer(os.path.join(root, file))
@@ -175,11 +174,9 @@ class ConformerTamilASR(object):
             
         while True:
             try:
-                transcription = ""
-                audios = []
                 frames = []
 
-                for i in range(0, int(16000 / 1024 * 7)):
+                for _ in range(0, int(16000 / 1024 * 7)):
                     data = self.stream.read(1024)
                     frames.append(data)
                         
@@ -201,6 +198,10 @@ class ConformerTamilASR(object):
                 self.stream.close()
                 self.p.terminate()
                 break
+        
+        self.stream.stop_stream()
+        self.stream.close()
+        self.p.terminate()
     
     def __call__(self):
         self.record_and_stream()
@@ -224,7 +225,7 @@ class DeepTamilASR(object):
   def infer_file(self, filepath=None, verbose=1):
     self.model.eval()
 
-    audio, sr = torchaudio.load(filepath)
+    audio, _ = torchaudio.load(filepath)
 
     if audio.shape[0] == 2:
       audio = audio[0][:]
@@ -248,7 +249,7 @@ class DeepTamilASR(object):
       return decoded_preds[0]
   
   def infer_dir(self, directory=None):
-    for root, dirs, files in os.walk(directory):
+    for root, _, files in os.walk(directory):
         for file in files:
           self.infer_file(os.path.join(root, file))
   
@@ -265,12 +266,9 @@ class DeepTamilASR(object):
                     input=True,
                     frames_per_buffer=1024)
 
-        transcription = ""
-        
-        audios = []
         frames = []
 
-        for i in range(0, int(48000 / 1024 * 8)):
+        for _ in range(0, int(48000 / 1024 * 8)):
           data = np.frombuffer(self.stream.read(1024), dtype=np.float32)
           frames.append(data)
         
@@ -304,6 +302,10 @@ class DeepTamilASR(object):
         self.p.terminate()
         del self.stream
         break
+    
+    self.stream.stop_stream()
+    self.stream.close()
+    self.p.terminate()
   
   def record_and_stream(self):
     self.model.eval()
@@ -318,11 +320,9 @@ class DeepTamilASR(object):
          
     while True:
       try:
-        transcription = ""
-        audios = []
         frames = []
 
-        for i in range(0, int(48000 / 1024 * 6)):
+        for _ in range(0, int(48000 / 1024 * 6)):
           data = self.stream.read(1024)
           frames.append(data)
                   
@@ -344,6 +344,10 @@ class DeepTamilASR(object):
         self.stream.close()
         self.p.terminate()
         break
+    
+    self.stream.stop_stream()
+    self.stream.close()
+    self.p.terminate()
   
   def __call__(self):
     self.record_and_stream()
