@@ -12,6 +12,7 @@ tamil_tech/utils/__pycache__
 tamil_tech/utils/featurizers/__pycache__
 tamil_tech/zero_shot/__pycache__
 test
+check-new.ipynb
 config.yml
 tamil_conformer_whole_M.model
 demo-Copy1.ipynb
