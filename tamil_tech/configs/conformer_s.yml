@@ -74,3 +74,6 @@ learning_config:
     log_interval_steps: 1000
     eval_interval_steps: 1000
     save_interval_steps: 2000
+
+link: "https://drive.google.com/file/d/1Iy6uwYvMo5KvwbUv4L4EMNFasepGpDmf/view?usp=sharing"
+file_id: "1Iy6uwYvMo5KvwbUv4L4EMNFasepGpDmf"
