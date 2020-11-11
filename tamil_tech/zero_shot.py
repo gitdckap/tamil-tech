@@ -17,7 +17,7 @@ from tamil_tech.torch.models import *
 
 import numpy as np
 import tensorflow as tf
-from tamil_tech.tf.utils import TFSpeechFeaturizer, CharFeaturizer, preprocess_paths, check_key_in_dict, append_default_keys_dict, CONFORMER_L, CONFORMER_M, CONFORMER_S, CONFORMER_S_V2, CONFORMER_S_UPDATED, load_conformer_model, download_file_from_google_drive
+from tamil_tech.tf.utils import TFSpeechFeaturizer, CharFeaturizer, preprocess_paths, check_key_in_dict, append_default_keys_dict, CONFORMER_L, CONFORMER_M, CONFORMER_S, CONFORMER_S_V2, CONFORMER_S_UPDATED, CONFORMER_S_UPDATED_V1, load_conformer_model, download_file_from_google_drive
 from tamil_tech.tf.models import Conformer
 
 class ConformerTamilASRLite(object):
@@ -87,8 +87,8 @@ class ConformerTamilASRLite(object):
               print('')
 
 class ConformerTamilASR(object):
-    def __init__(self, greedy=False, path='ConformerSupdated.h5'):
-        config = CONFORMER_S_UPDATED
+    def __init__(self, greedy=False, path='Conformer_S_updated_v1.h5'):
+        config = CONFORMER_S_UPDATED_V1
 
         speech_featurizer = TFSpeechFeaturizer(config["speech_config"])
         text_featurizer = CharFeaturizer(config["decoder_config"])
