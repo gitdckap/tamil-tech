@@ -11,7 +11,7 @@ speech_config:
 
 decoder_config:
   vocabulary: tamil_tech/vocabularies/tamil_new_vocab.txt
-  target_vocab_size: 64
+  target_vocab_size: 1024
   max_subword_length: 4
   blank_at_zero: True
   beam_width: 5
@@ -33,13 +33,13 @@ model_config:
   kernel_size: 32
   fc_factor: 0.5
   dropout: 0.1
-  embed_dim: 320
+  embed_dim: 512
   embed_dropout: 0.0
   num_rnns: 1
   rnn_units: 320
   rnn_type: lstm
   layer_norm: True
-  joint_dim: 320
+  joint_dim: 1024
 
 learning_config:
   augmentations:
@@ -47,7 +47,7 @@ learning_config:
       time_masking:
         num_masks: 10
         mask_factor: 100
-        p_upperbound: 0.05
+        p_upperbound: 0.2
       freq_masking:
         num_masks: 1
         mask_factor: 27
@@ -55,6 +55,8 @@ learning_config:
   dataset_config:
     train_paths:
       - data/oslr_train.tsv
+      - data/oslr_dev.tsv
+      - data/oslr_test.tsv
     eval_paths:
       - data/oslr_dev.tsv
     test_paths:
@@ -68,13 +70,13 @@ learning_config:
     epsilon: 1e-9
 
   running_config:
-    batch_size: 1
+    batch_size: 12
     accumulation_steps: 1
-    num_epochs: 20
-    outdir: trained_models/tamil_conformer_S_updated
+    num_epochs: 25
+    outdir: trained_models/tamil_conformer_S_updated_v1
     log_interval_steps: 300
     eval_interval_steps: 500
     save_interval_steps: 1000
 
-link: "https://drive.google.com/file/d/17CGTP1u8OjHNRU4FaCZ49ud3PxGIVZoi/view?usp=sharing"
-file_id: "17CGTP1u8OjHNRU4FaCZ49ud3PxGIVZoi"
+link: "https://drive.google.com/file/d/1_b97ttSN2F4L263VskwXbEtCcMc_UPsb/view?usp=sharing"
+file_id: "1_b97ttSN2F4L263VskwXbEtCcMc_UPsb"
