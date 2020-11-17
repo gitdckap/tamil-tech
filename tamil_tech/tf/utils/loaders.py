@@ -63,6 +63,7 @@ CONFORMER_S = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_s.yml", lea
 CONFORMER_S_V2 = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_s_v2.yml", learning=True)
 CONFORMER_S_UPDATED = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_s_updated.yml", learning=True)
 CONFORMER_S_UPDATED_V1 = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_s_updated_v1.yml", learning=True)
+CONFORMER_S_UPDATED_V11 = UserConfig(DEFAULT_YAML, "tamil_tech/configs/conformer_s_updated_v1_1.yml", learning=True)
 
 def download_file_from_google_drive(id, destination):
     URL = "https://docs.google.com/uc?export=download"
