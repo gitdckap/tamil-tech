@@ -31,6 +31,7 @@ __pycache__
 conformer_s_v1.h5
 conformer_s_v1.tflite
 saved_model.py
+ConformerSupdatedv1.h5
 conformer_s_v1_whole.model
 import_graph.py
 tamil_conformer_s_v1_whole.h5
