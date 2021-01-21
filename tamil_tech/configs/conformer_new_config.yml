@@ -1,0 +1,145 @@
+speech_config:
+  sample_rate: 16000
+  frame_ms: 25
+  stride_ms: 10
+  num_feature_bins: 80
+  feature_type: log_mel_spectrogram
+  preemphasis: 0.97
+  normalize_signal: True
+  normalize_feature: True
+  normalize_per_feature: False
+
+decoder_config:
+  vocabulary: tamil_tech/vocabularies/tamil_unicode.txt
+  target_vocab_size: 74
+  max_subword_length: 4
+  blank_at_zero: True
+  beam_width: 0
+  norm_score: True
+
+model_config:
+  # Conformer S
+  name: conformer
+  encoder_subsampling:
+    type: conv2d
+    filters: 144
+    kernel_size: 3
+    strides: 2
+  encoder_positional_encoding: sinusoid_concat
+  encoder_dmodel: 144
+  encoder_num_blocks: 16
+  encoder_head_size: 36
+  encoder_num_heads: 4
+  encoder_mha_type: relmha
+  encoder_kernel_size: 32
+  encoder_fc_factor: 0.5
+  encoder_dropout: 0.1
+  prediction_embed_dim: 320
+  prediction_embed_dropout: 0
+  prediction_num_rnns: 1
+  prediction_rnn_units: 320
+  prediction_rnn_type: lstm
+  prediction_rnn_implementation: 1
+  prediction_layer_norm: True
+  prediction_projection_units: 0
+  joint_dim: 320
+  joint_activation: tanh
+
+  # # Conformer M
+  # name: conformer
+  # encoder_subsampling:
+  #   type: conv2d
+  #   filters: 256
+  #   kernel_size: 3
+  #   strides: 2
+  # encoder_positional_encoding: sinusoid_concat
+  # encoder_dmodel: 256
+  # encoder_num_blocks: 16
+  # encoder_head_size: 36
+  # encoder_num_heads: 4
+  # encoder_mha_type: relmha
+  # encoder_kernel_size: 32
+  # encoder_fc_factor: 0.5
+  # encoder_dropout: 0.1
+  # prediction_embed_dim: 640
+  # prediction_embed_dropout: 0
+  # prediction_num_rnns: 1
+  # prediction_rnn_units: 640
+  # prediction_rnn_type: lstm
+  # prediction_rnn_implementation: 1
+  # prediction_layer_norm: True
+  # prediction_projection_units: 0
+  # joint_dim: 640
+  # joint_activation: tanh
+
+  # # Conformer L
+  # name: conformer
+  # encoder_subsampling:
+  #   type: conv2d
+  #   filters: 512
+  #   kernel_size: 3
+  #   strides: 2
+  # encoder_positional_encoding: sinusoid_concat
+  # encoder_dmodel: 512
+  # encoder_num_blocks: 17
+  # encoder_head_size: 36
+  # encoder_num_heads: 8
+  # encoder_mha_type: relmha
+  # encoder_kernel_size: 32
+  # encoder_fc_factor: 0.5
+  # encoder_dropout: 0.1
+  # prediction_embed_dim: 640
+  # prediction_embed_dropout: 0
+  # prediction_num_rnns: 1
+  # prediction_rnn_units: 640
+  # prediction_rnn_type: lstm
+  # prediction_rnn_implementation: 1
+  # prediction_layer_norm: True
+  # prediction_projection_units: 0
+  # joint_dim: 640
+  # joint_activation: tanh
+
+learning_config:
+  augmentations:
+    after:
+      time_masking:
+        num_masks: 10
+        mask_factor: 100
+        p_upperbound: 0.05
+      freq_masking:
+        num_masks: 1
+        mask_factor: 27
+
+  dataset_config:
+    train_paths:
+      - new_train.tsv
+      - new_ms_train.tsv
+      - new_dev.tsv
+      - new_slr_male.tsv
+      - new_slr_female.tsv
+      - new_test.tsv
+      - new_validated.tsv
+      - new_other.tsv
+    eval_paths:
+      - new_ms_test_1.tsv
+    test_paths:
+      - new_ms_test_2.tsv
+    tfrecords_dir: null
+
+  optimizer_config:
+    warmup_steps: 40000
+    beta1: 0.9
+    beta2: 0.98
+    epsilon: 1e-9
+
+  running_config:
+    batch_size: 4
+    accumulation_steps: 4
+    num_epochs: 20
+    outdir: ga_conformer_S_80
+    log_interval_steps: 300
+    eval_interval_steps: 500
+    save_interval_steps: 1000
+
+file_id: 1thvXVQeqr0c-txBPEDvX8tNyniuo6SXW
+url: https://drive.google.com/file/d/1thvXVQeqr0c-txBPEDvX8tNyniuo6SXW/view?usp=sharing
