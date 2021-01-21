@@ -210,6 +210,8 @@ def calc_same_padding(kernel_size):
     pad = kernel_size // 2
     return (pad, pad + (kernel_size + 1) % 2)
 
+# Following are available in PyTorch by default
+
 class Transpose(nn.Module):
     """
     Transpose as a Layer

@@ -16,28 +16,33 @@ class Decoder(nn.Module):
             pe_maxlen=5000):
         super(Decoder, self).__init__()
         # parameters
-        self.sos_id = sos_id  # Start of Sentence
-        self.eos_id = eos_id  # End of Sentence
-        self.n_tgt_vocab = n_tgt_vocab
-        self.d_word_vec = d_word_vec
-        self.n_layers = n_layers
-        self.n_head = n_head
-        self.d_k = d_k
-        self.d_v = d_v
-        self.d_model = d_model
-        self.d_inner = d_inner
-        self.dropout = dropout
-        self.tgt_emb_prj_weight_sharing = tgt_emb_prj_weight_sharing
-        self.pe_maxlen = pe_maxlen
+        self.sos_id = sos_id  # Start of Sentence ID
+        self.eos_id = eos_id  # End of Sentence ID
+        self.n_tgt_vocab = n_tgt_vocab # target vocab size
+        self.d_word_vec = d_word_vec # word vectore dimensions
+        self.n_layers = n_layers # number of layers
+        self.n_head = n_head # number of attention heads
+        self.d_k = d_k # number of dimensions for key
+        self.d_v = d_v # number of dimensions for value
+        self.d_model = d_model # number of dimensions for model
+        self.d_inner = d_inner # nummber of dimensions for inner 
+        self.dropout = dropout # dropout rate
+        self.tgt_emb_prj_weight_sharing = tgt_emb_prj_weight_sharing # target embedding wieght sharing
+        self.pe_maxlen = pe_maxlen # positional encoding maximum length
 
+        # target embedding
         self.tgt_word_emb = nn.Embedding(n_tgt_vocab, d_word_vec)
+        # positional encoding
         self.positional_encoding = PositionalEncoding(d_model, max_len=pe_maxlen)
+        # dropout rate
         self.dropout = nn.Dropout(dropout)
 
+        # decoder layer stack
         self.layer_stack = nn.ModuleList([
             DecoderLayer(d_model, d_inner, n_head, d_k, d_v, dropout=dropout)
             for _ in range(n_layers)])
 
+        # Target word projection Linear layer
         self.tgt_word_prj = nn.Linear(d_model, n_tgt_vocab, bias=False)
         nn.init.xavier_normal_(self.tgt_word_prj.weight)
 

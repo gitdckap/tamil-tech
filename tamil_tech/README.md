@@ -26,9 +26,230 @@ The datasets module that contains classes that can download datasets for ASR as 
 
 ### Layers
 
+The Layers module consists of multiple activation and neural network layers as torch modules, mostly taken from PyTorch forums and research papers. Apart from these, PyTorch's layers can be used and different version of layers for the same are given in this module.
+
+#### CustomSwish
+
+Swish activation function with foward and backward pass for memory and computational optimization.
+
+**Methods:**
+
+* **forward:** Performs forward pass of Swish over input tensor and returns swish activation applied output tensor
+* **backward:** Performs backward pass of Swish over input tensor and returns the gradient
+
+#### Swish
+
+Swish activation function that can be used as a layer
+
+**Args:** Accepts input tensor and applies swish activation over it
+
+#### SpecAug
+
+Spectrogram Augmentation as a layer.
+
+**Args**:
+
+* training: bool - If training or not, for applying spectorgram augmentation
+* freq_len: int - Frequency Length
+* time_len: int - Time length
+* freq_mask: int - Frequency masking parameter
+* time_mask: int - Time masking parameter
+
+**Members:**
+
+* training: bool - If training or not, for applying spectorgram augmentation
+* freq_len: int - Frequency Length
+* time_len: int - Time length
+* freq_mask: int - Frequency masking parameter
+* time_mask: int - Time masking parameter
+
+**Methods:**
+
+* **forward:** Applies frequency masking and time masking over the input tensor and returns augmented spectrogram
+
+#### LayerNorm & LayerNormaliztion
+
+Layer Normalization with batch and time transposed
+
+#### ResidualBlock & Residual
+
+ResidualNet based feature extraction as a layer
+
+**Args**:
+
+* in_channels: int - input channels
+* out_channels: int - output channels
+* kernel: int - Size of kernel
+* stride: int - Size of stride
+* n_feats: int - Number of features for normalization
+* dropout: float - dropout rate
+
+**Members:**
+
+* ln1, ln2 - Layer Normalziation
+* dropout1, dropout2 - Dropout Layer
+* cnn1, cnn2 - Convolution 2D Layer
+* swish1, swish2 - Swish Activation
+* bn1, bn2 - Batch Normalization 2D
+
+**Methods:**
+
+* **forward:** returns residual tensor added with feature extracted tensor
+
+#### BidirectionalRNN & BiGRU
+
+**Args**:
+
+* rnn_dim: int - Dimensions for RNN layer
+* hidden_size: int - Hidden units
+* batch_first: bool - batch as first axis in tensor or not
+* dropout: float - dropout rate
+
+* rnn - Type of RNN to be used, GRU or LSTM
+
+**Members:**
+
+* layer_norm - Layer Normalization
+* BiGRU - bidirectional RNN
+* swish - swish activation
+* dropout - dropout layer
+
+**Methods:**
+
+* **forward:** returns seqeunce tensor
+
 ### Encoders
 
+Encoders module consists of multiple encoders that can be used as front-end encoder for encoding or feature-extraction in the transformer based network.
+
+#### EncoderLayer
+
+Composed with two sub-layers: A multi-head self-attention mechanism, A simple, position-wise fully connected feed-forward network.
+
+**Args:**
+
+* d_model - number of dimensions for model
+* d_inner - nummber of dimensions for inner 
+* n_head - number of attention heads
+* d_k - number of dimensions for key
+* d_v - number of dimensions for value
+* dropout - dropout rate
+
+**Members:**
+
+* slf_attn - Self attention layer
+* pos_ffn - Positional Feed Forward layer
+
+**Methods:**
+
+* forward: Performs decoding operations via the layers and returns decoded tensor, and self attention weights
+
+#### Encoder
+
+**Args:**
+
+* d_input - input dimensions
+* n_layers - number of layers
+* n_head - number of attention heads
+* d_k - number of dimensions for key
+* d_v - number of dimensions for value
+* d_model - number of dimensions for model
+* d_inner - nummber of dimensions for inner 
+* dropout - dropout rate
+* pe_maxlen - positional encoding maximum length
+
+**Members:**
+
+* d_input - input dimensions
+* n_layers - number of layers
+* n_head - number of attention heads
+* d_k - number of dimensions for key
+* d_v - number of dimensions for value
+* d_model - number of dimensions for model
+* d_inner - nummber of dimensions for inner 
+* dropout_rate - dropout rate
+* pe_maxlen - positional encoding maximum length
+* linear_in - Linear layer for input embedding
+* layer_norm_in - Layer Normalization for input embedding
+* positional_encoding - positional encoding layer
+* dropout - dropout layer
+* layer_stack - Encoder Layers as a list
+
+**Methods**
+
+* **forward:** Accepts padded input, length of inputs and performs the encoding operation and returns output tensor and attention weights if selected as True.
+
 ### Decoders
+
+Decoders module consists of multiple decoders that can be used for decoding operations in the neural network.
+
+### DecoderLayer
+
+**Args:** 
+
+* d_model - number of dimensions for model
+* d_inner - nummber of dimensions for inner 
+* n_head - number of attention heads
+* d_k - number of dimensions for key
+* d_v - number of dimensions for value
+* dropout - dropout rate
+
+**Members:**
+
+* slf_attn - Self attention layer
+* enc_attn - Self attention layer for encoding
+* pos_ffn - Positional Feed Forward layer
+
+**Methods:**
+
+* forward: Performs decoding operations via the layers and returns decoded tensor, self attention weights and encoded attention weights
+
+#### Decoder
+
+A self attention based decoder
+
+**Args:** 
+
+* sos_id - Start of Sentence ID
+* eod_id - End of Sentence ID
+* n_tgt_vocab - target vocab size
+* d_word_vec - word vectore dimensions
+* n_layers - number of layers
+* n_head - number of attention heads
+* d_k - number of dimensions for key
+* d_v - number of dimensions for value
+* d_model - number of dimensions for model
+* d_inner - nummber of dimensions for inner 
+* dropout - dropout rate
+* tgt_emb_prj_weight_sharing - target embedding weight sharing
+* pe_maxlen - positional encoding maximum length
+
+**Members:**
+
+* sos_id - Start of Sentence ID
+* eod_id - End of Sentence ID
+* n_tgt_vocab - target vocab size
+* d_word_vec - word vectore dimensions
+* n_layers - number of layers
+* n_head - number of attention heads
+* d_k - number of dimensions for key
+* d_v - number of dimensions for value
+* d_model - number of dimensions for model
+* d_inner - nummber of dimensions for inner 
+* dropout - dropout rate
+* tgt_emb_prj_weight_sharing - target embedding weight sharing
+* pe_maxlen - positional embedding maximum length
+* tgt_word_emb - target embedding layer
+* positional encoding - positional encoding layer
+* dropout - dropout layer
+* layer_stack - List of Decoder layers
+* tgt_word_prj - Target word projection Linear layer
+
+**Methods:**
+
+* **preporcess:** Generates decoder input and output label from padded_input. Add <sos> to decoder input, and add <eos> to decoder output label. Returns padded input text and labels
+* **forward:** Processes the decoding network and returns decoded output tensor
+* **recognize_beam:** Performs Beam Search, decodes single utterance
 
 ### Models
 
