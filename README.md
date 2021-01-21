@@ -54,6 +54,7 @@ Conformer S (character level) pretrained model is available at this [Drive link]
 * [Deep Speech 2](https://arxiv.org/pdf/1512.02595.pdf)
 * [Deep Residual Learning For Image Recognition (ResNet paper for Residual Blocks)](https://arxiv.org/pdf/1512.03385.pdf)
 * [Speech Transformer no-recurrence sequence to sequence](http://150.162.46.34:8080/icassp2018/ICASSP18_USB/pdfs/0005884.pdf)
+* [SpecAugment](https://arxiv.org/pdf/1904.08779.pdf)
 * [RNN Transducer](https://arxiv.org/pdf/1211.3711.pdf)
 * [Conformer Transducer](https://arxiv.org/pdf/2005.08100.pdf)
 * [Streaming Transducer](https://arxiv.org/abs/1811.06621.pdf)
