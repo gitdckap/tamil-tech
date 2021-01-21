@@ -36,11 +36,8 @@ Documentation for the library modules and functions have been specified in [Docu
 
 Conformer S (character level) pretrained model is available at this [Drive link](https://drive.google.com/file/d/1thvXVQeqr0c-txBPEDvX8tNyniuo6SXW/view?usp=sharing)
 
-
-| **Model name:**                 | Conformer S                                                                         |
-| **Vocabulary:**                 | Tamil unicode data (Available under `tamil_tech/vocabularies/tamil_unicode.txt`)    |
-| **Test Word Error Rate (WER):** | 24.1 % (Beam Search), 42.8 % (Greedy)                                               |
-| **Test Char Error Rate (WER):** | 10.2 % (Beam Search), 17.1 % (Greedy)                                               |
+| **Model name:**                 |                                 **Vocabulary:**                                   |     **Test Word Error Rate (WER):**     |       **Test Char Error Rate (WER):**            |
+| Conformer S                     |  Tamil unicode data (Available under `tamil_tech/vocabularies/tamil_unicode.txt`) |  24.1 % (Beam Search), 42.8 % (Greedy)  |       10.2 % (Beam Search), 17.1 % (Greedy)      |
 
 ## References
 
