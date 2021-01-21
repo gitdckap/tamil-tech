@@ -18,6 +18,10 @@ The library can be installed using the [pip](https://www.google.com/url?sa=t&rct
 
 `pip install tamil_tech`
 
+(or)
+
+`pip3 install tamil_tech`
+
 ## Documentation
 
 For documentation check [tamil_tech/README.md](tamil_tech/README.md)
