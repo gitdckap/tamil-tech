@@ -18,7 +18,7 @@ The library can be installed using the [pip](https://www.google.com/url?sa=t&rct
 
 ## Documentation
 
-Documentation for the library modules and functions have been specified in [Documentaion.md](tamil_tech/Documentation/md)
+Documentation for the library modules and functions have been specified in [tamil_tech](tamil_tech/README.md) directory
 
 ## Corpus & Pretrained Models
 
