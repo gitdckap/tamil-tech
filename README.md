@@ -2,6 +2,8 @@
 
 Tamil Tech is an Open-Source Library for end-to-end Natural Language Processing & Speech Processing for Tamil developed by DCKAP aiming to provide a common platform that allows developers, students, researchers, and experts around the world to build exciting AI based language and speech applications for Tamil language.
 
+**Note:** This library is currently in its early development stages.
+
 ### Setup
 
 #### From source 
