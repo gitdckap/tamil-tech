@@ -4,15 +4,15 @@ Tamil Tech is an Open-Source Library for end-to-end Natural Language Processing 
 
 **Note:** This library is currently in its early development stages.
 
-### Setup
+## Setup
 
-#### From source 
+### From source 
 
 * Clone the repository using the following command: `git clone https://github.com/gitdckap/tamil-tech`
 * Navigate to the location of the repository where it was cloned on the machine: `cd tamil-tech`
 * Install the library using: `pip install .` or `pip3 install .`
 
-#### Using pip
+### Using pip
 
 The library can be installed using the [pip](https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&cad=rja&uact=8&ved=2ahUKEwif8Z7nr63uAhURfisKHVs0D7QQFjAAegQICBAC&url=https%3A%2F%2Fpypi.org%2Fproject%2Fpip%2F&usg=AOvVaw3bSOt-iIC9cvaKRbpvf4Yu) package manager for Python
 
