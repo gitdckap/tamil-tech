@@ -116,7 +116,80 @@ ResidualNet based feature extraction as a layer
 
 **Methods:**
 
-* **forward:** returns seqeunce tensor
+* **forward:** returns sequence tensor
+
+#### Transpose
+
+Transpose fucntion as a layer.
+
+**Args**: 
+
+* dims - Dimensions to transpose
+
+**Members:**
+
+* dims - Dimensions to transpose
+
+**Methods:**
+
+* **forward:** returns transposes tensor
+
+#### GLU
+
+Implementation of GLU activation as a layer
+
+**Args**:
+
+* dim - dimension to apply GLU activation on
+
+**Members:**
+
+* dim - dimension to apply GLU activation on
+
+**Methods:**
+
+* **forward:** returns GLU activated tensor
+
+#### DepthwiseConv1d
+
+Implements depth wise 1D convolution
+
+**Args**:
+
+* chan_in - Number of input channels
+* chan_out - Number of output channels
+* kernel_size - Size of kernel
+* padding - Padding to be applied
+
+**Members:**
+
+* padding - Padding to be applied
+* conv - Conv1D layer
+* conv_out - Conv1D output layer
+
+**Methods:**
+
+* **forward:** returns depth wise 1d convoultion applied tensor
+
+#### ConformerConvModule
+
+**Args**:
+
+* dim - Input dimensions/channels
+* causal - to apply causal padding or not
+* expansion_factor - factor expansion of input tensor
+* kernel_size - size of the kernel
+* dropout - dropout rate
+
+**Members:**
+
+* net - Implements Conformer Convolution as a torch Sequential layer
+
+**Methods:**
+
+* **forward:** returns conformer convoultion applied tensor
+
+Apart from these: ScaledDotProductAttention, PosiitonalEncoding, RelativePositionalEmbedding, Multiheadattention, FeedForward layers are already available on PyTorch.
 
 ### Encoders
 
@@ -253,15 +326,122 @@ A self attention based decoder
 
 ### Models
 
+#### TamilASRModel
+
+TamilASRModel is the ASR model that is similar to Deep speech 2.
+
+**Args:** 
+
+* n_cnn_layers - Number of CNN layers for feature extraction
+* n_rnn_layers - Number of RNN layers for sequence learning
+* rnn_dim - Dimensions for RNN layers
+* n_class - vocab size
+* n_feats - Nummber of features for layer normalization
+* stride - Stride size
+* dropout - dropout rate
+* training - if model is training or not
+
+**Members:**
+
+* cnn - CNN input layer
+* rescnn_layers - Residual net based cnn layers
+* fully_connected - Linear layer for dimenionality reduction
+* birnn_layers - Bidirectional RNN layers
+* classifier - Decoder network using linear layers,a ctivation and dropout
+
+**Methods:**
+
+* **forward:** accepts audio speectrogram and returns predicted sequence
+
+#### Transformer
+
+A simple encoder-decoder based transformer using attention
+
+**Args:**
+
+* encoder - Encoder to be used
+* decoder - Decoder to be used
+
+**Members:**
+
+* encoder - Encoder to be used
+* decoder - Decoder to be used
+
+**Methods:**
+
+* **forward:** Accepts spectrogram tensor and returns predicted sequence
+* **recognize:** Accepts spectrogram tensor and returns predicted sequence using Bema search
+
 ### Loss
+
+#### cal_performance
+
+Calculate cross entropy loss, apply label smoothing if needed.
+    
+**Args:**
+
+* pred: N x T x C, score before softmax
+* gold: N x T
+
+#### cal_loss
+
+Calculates cross entropy loss, applies label smoothing if needed
+
+**Args:**
+
+* pred: N x T x C, score before softmax
+* gold: N x T
+* smoothing: label smoothing value
 
 ### Optimizers
 
+#### TransformerOptimizer
+
+A simple wrapper class for learning rate scheduling. Works the same way as PyTorch's optimizer
+
 ### Run
+
+Training and testing functions for the ASR models present in `models`
 
 ### Transforms
 
+Transformation objects
+
+#### SpecAug
+
+Spectrogram Augmentation as a layer.
+
+**Args**:
+
+* training: bool - If training or not, for applying spectorgram augmentation
+* freq_len: int - Frequency Length
+* time_len: int - Time length
+* freq_mask: int - Frequency masking parameter
+* time_mask: int - Time masking parameter
+
+**Members:**
+
+* training: bool - If training or not, for applying spectorgram augmentation
+* freq_len: int - Frequency Length
+* time_len: int - Time length
+* freq_mask: int - Frequency masking parameter
+* time_mask: int - Time masking parameter
+
+**Methods:**
+
+* **forward:** Applies frequency masking and time masking over the input tensor and returns augmented spectrogram
+
+#### train_audio_transforms
+
+Transforms for training audio set, sample rate at 16000, number of mels at 128, set to normalized mode
+
+#### valid_audio_transforms
+
+Transforms for valdiation and testing audio set, sample rate at 16000, number of mels at 128, set to normalized mode
+
 ### Utils
+
+Self-explanatory utilty functions to downlaod file from google drive, calculate WER, CER, use greedy decoding, load model, dataset iterator, and character class.
 
 ## Zero Shot
 

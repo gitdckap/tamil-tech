@@ -6,45 +6,45 @@ from tamil_tech.torch.layers import *
 from tamil_tech.torch.encoders import *
 from tamil_tech.torch.decoders import *
 
-class CustomCNNbiRNN(nn.Module):
-    """
-    ASR Model similar to Deep Speech
-    """
-    def __init__(self, n_cnn_layers, n_rnn_layers, rnn_dim, n_class, n_feats, stride=2, dropout=0.1, training=True):
-        super(CustomCNNbiRNN, self).__init__()
+# class CustomCNNbiRNN(nn.Module):
+#     """
+#     ASR Model similar to Deep Speech
+#     """
+#     def __init__(self, n_cnn_layers, n_rnn_layers, rnn_dim, n_class, n_feats, stride=2, dropout=0.1, training=True):
+#         super(CustomCNNbiRNN, self).__init__()
 
-        n_feats = n_feats//2
+#         n_feats = n_feats//2
 
-        self.in_cnn = nn.Conv2d(1, 32, 3, stride=stride, padding=3//2)
+#         self.in_cnn = nn.Conv2d(1, 32, 3, stride=stride, padding=3//2)
 
-        self.residual_blocks = nn.Sequential(*[
-            ResidualBlock(32, 32, kernel=3, stride=1, n_feats=n_feats) 
-            for _ in range(n_cnn_layers)
-        ])
+#         self.residual_blocks = nn.Sequential(*[
+#             ResidualBlock(32, 32, kernel=3, stride=1, n_feats=n_feats) 
+#             for _ in range(n_cnn_layers)
+#         ])
 
-        self.pointwise = nn.Linear(n_feats*32, rnn_dim)
+#         self.pointwise = nn.Linear(n_feats*32, rnn_dim)
 
-        self.birnn_blocks = nn.Sequential(*[BidirectionalRNN(rnn_dim=rnn_dim if i==0 else rnn_dim*2, hidden_size=rnn_dim, dropout=dropout, batch_first=i==0) for i in range(n_rnn_layers)])
+#         self.birnn_blocks = nn.Sequential(*[BidirectionalRNN(rnn_dim=rnn_dim if i==0 else rnn_dim*2, hidden_size=rnn_dim, dropout=dropout, batch_first=i==0) for i in range(n_rnn_layers)])
         
-        self.classifier = nn.Sequential(
-            nn.Linear(rnn_dim*2, rnn_dim),  
-            Swish(),
-            nn.Linear(rnn_dim, n_class)
-        )
+#         self.classifier = nn.Sequential(
+#             nn.Linear(rnn_dim*2, rnn_dim),  
+#             Swish(),
+#             nn.Linear(rnn_dim, n_class)
+#         )
     
-    def forward(self, x):        
-        x = self.in_cnn(x)
-        x = self.residual_blocks(x)
+#     def forward(self, x):        
+#         x = self.in_cnn(x)
+#         x = self.residual_blocks(x)
         
-        sizes = x.size()
-        x = x.view(sizes[0], sizes[1] * sizes[2], sizes[3])  
+#         sizes = x.size()
+#         x = x.view(sizes[0], sizes[1] * sizes[2], sizes[3])  
         
-        x = x.transpose(1, 2) 
-        x = self.pointwise(x)
-        x = self.birnn_blocks(x)
-        x = self.classifier(x)
+#         x = x.transpose(1, 2) 
+#         x = self.pointwise(x)
+#         x = self.birnn_blocks(x)
+#         x = self.classifier(x)
         
-        return x
+#         return x
         
 class TamilASRModel(nn.Module):
     """
