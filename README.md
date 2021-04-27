@@ -84,6 +84,7 @@ Conformer S (character level) pretrained model is available at this [Drive link]
 
 ## Contributors
 
+* [Suresh Selvam](https://github.com/sureshsdckap)
 * [Akshay Kumaar M](https://github.com/aksh-ai)
 * [Madhava Kumar M S](https://github.com/Madhavakumar)
 
