@@ -35,9 +35,9 @@ class ConformerTamilASR(object):
     """
     Conformer S based ASR model
     """
-    def __init__(self, path='ConformerS.h5'):
+    def __init__(self, path = 'ConformerS.h5'):
         # fetch and load the config of the model
-        config = Config('tamil_tech/configs/conformer_new_config.yml', learning=True)
+        config = Config('tamil_tech/configs/conformer_new_config.yml',learnig=True)
 
         # load speech and text featurizers
         speech_featurizer = TFSpeechFeaturizer(config.speech_config)
@@ -118,6 +118,13 @@ class ConformerTamilASR(object):
         
         # return predicted transcription
         print(self.bytes_to_string(pred.numpy())[0], end=' ')
+
+    def infer_dir(self, directory=None):
+        for root, _, files in os.walk(directory):
+            for file in files:
+              print(f"Filename: {file} | ", end='')
+              self.infer(os.path.join(root, file))
+              print('')
 
 class SubwordConformerTamilASR(object):
     """
